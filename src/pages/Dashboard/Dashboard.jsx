@@ -193,16 +193,15 @@ const Dashboard = () => {
   // Helper function to get type icon
   function getTypeIcon(type) {
     switch (type) {
-      case 'BANK_ACCOUNT': return <TbBuildingBank className="h-5 w-5" />;
-      case 'MONEY_MARKET': return <TbPigMoney className="h-5 w-5" />;
-      case 'STOCKS': return <TbTrendingUp className="h-5 w-5" />;
-      case 'MPESA': return <TbCreditCard className="h-5 w-5" />;
-      case 'SACCO': return <TbWallet className="h-5 w-5" />;
-      case 'OTHER': return <TbCurrencyDollar className="h-5 w-5" />;
-      default: return <TbCurrencyDollar className="h-5 w-5" />;
+      case 'BANK_ACCOUNT': return <TbBuildingBank className="h-5 w-5 text-white" />;
+      case 'MONEY_MARKET': return <TbPigMoney className="h-5 w-5 text-white" />;
+      case 'STOCKS': return <TbTrendingUp className="h-5 w-5 text-white" />;
+      case 'MPESA': return <TbCreditCard className="h-5 w-5 text-white" />;
+      case 'SACCO': return <TbWallet className="h-5 w-5 text-white" />;
+      case 'OTHER': return <TbCurrencyDollar className="h-5 w-5 text-white" />;
+      default: return <TbCurrencyDollar className="h-5 w-5 text-white" />;
     }
   }
-  
   if (loading) {
     return (
       <MainLayout>
@@ -334,7 +333,6 @@ const Dashboard = () => {
           </Link>
         </div>
       </div>
-
       {activeTab === 'overview' && (
         <>
           {/* Stats cards */}
@@ -464,69 +462,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </>
-      )}
-
-      {/* Time period selector */}
-      <div className="mt-6 bg-white shadow rounded-lg p-4">
-        <div className="sm:flex sm:items-center">
-          <div className="sm:flex-auto">
-            <h3 className="text-lg font-medium text-gray-900">Historical Net Worth</h3>
-          </div>
-          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <div className="flex space-x-2">
-              <button
-                type="button"
-                onClick={() => setTimePeriod('week')}
-                className={`inline-flex items-center px-3 py-1.5 border ${
-                  timePeriod === 'week'
-                    ? 'border-primary-600 bg-primary-50 text-primary-700'
-                    : 'border-gray-300 bg-white text-gray-700'
-                } rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
-              >
-                Week
-              </button>
-              <button
-                type="button"
-                onClick={() => setTimePeriod('month')}
-                className={`inline-flex items-center px-3 py-1.5 border ${
-                  timePeriod === 'month'
-                    ? 'border-primary-600 bg-primary-50 text-primary-700'
-                    : 'border-gray-300 bg-white text-gray-700'
-                } rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
-              >
-                Month
-              </button>
-              <button
-                type="button"
-                onClick={() => setTimePeriod('quarter')}
-                className={`inline-flex items-center px-3 py-1.5 border ${
-                  timePeriod === 'quarter'
-                    ? 'border-primary-600 bg-primary-50 text-primary-700'
-                    : 'border-gray-300 bg-white text-gray-700'
-                } rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
-              >
-                Quarter
-              </button>
-              <button
-                type="button"
-                onClick={() => setTimePeriod('year')}
-                className={`inline-flex items-center px-3 py-1.5 border ${
-                  timePeriod === 'year'
-                    ? 'border-primary-600 bg-primary-50 text-primary-700'
-                    : 'border-gray-300 bg-white text-gray-700'
-                } rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
-              >
-                Year
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Charts and data visualization */}
-      {activeTab === 'overview' && (
-        <>
+          
           {/* Charts grid */}
           <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Net Worth Trend Chart */}
@@ -653,7 +589,56 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-
+        </>
+      )}
+      {/* Quick actions */}
+      <div className="mt-8 bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
+        <div className="px-6 py-5 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link
+              to="/financial-sources"
+              className="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition duration-150 ease-in-out shadow-sm"
+            >
+              <div className="flex-shrink-0 bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg p-3">
+                <TbWallet className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <h4 className="text-sm font-medium text-gray-900">Manage Sources</h4>
+                <p className="mt-1 text-xs text-gray-500">Add, edit, or remove financial sources</p>
+              </div>
+            </Link>
+            <Link
+              to="/"
+              className="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition duration-150 ease-in-out shadow-sm"
+            >
+              <div className="flex-shrink-0 bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-3">
+                <TbRefresh className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <h4 className="text-sm font-medium text-gray-900">Update Balances</h4>
+                <p className="mt-1 text-xs text-gray-500">Record new balances for your accounts</p>
+              </div>
+            </Link>
+            <Link
+              to="/"
+              className="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition duration-150 ease-in-out shadow-sm"
+            >
+              <div className="flex-shrink-0 bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-3">
+                <TbChartLine className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <h4 className="text-sm font-medium text-gray-900">View Analytics</h4>
+                <p className="mt-1 text-xs text-gray-500">See detailed financial analytics</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </div>
+      {activeTab === 'overview' && (
+        <>
           {/* Financial sources list */}
           <div className="mt-8 bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
             <div className="px-6 py-5 border-b border-gray-100">
@@ -753,52 +738,7 @@ const Dashboard = () => {
         </>
       )}
       
-      {/* Quick actions */}
-      <div className="mt-6 bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-            <Link
-              to="/financial-sources"
-              className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              <div className="flex-shrink-0 bg-primary-100 rounded-md p-2">
-                <TbWallet className="h-6 w-6 text-primary-600" />
-              </div>
-              <div className="ml-4">
-                <h4 className="text-sm font-medium text-gray-900">Manage Sources</h4>
-                <p className="text-xs text-gray-500">Add, edit, or remove financial sources</p>
-              </div>
-            </Link>
-            <Link
-              to="/"
-              className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              <div className="flex-shrink-0 bg-green-100 rounded-md p-2">
-                <TbRefresh className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <h4 className="text-sm font-medium text-gray-900">Update Balances</h4>
-                <p className="text-xs text-gray-500">Record new balances for your accounts</p>
-              </div>
-            </Link>
-            <Link
-              to="/"
-              className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              <div className="flex-shrink-0 bg-blue-100 rounded-md p-2">
-                <TbChartLine className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <h4 className="text-sm font-medium text-gray-900">View Analytics</h4>
-                <p className="text-xs text-gray-500">See detailed financial analytics</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </div>
+      
     </MainLayout>
   );
 };

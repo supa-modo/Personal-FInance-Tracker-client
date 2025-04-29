@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { TbLock, TbMail, TbUser, TbChartPie } from 'react-icons/tb';
+import { 
+  TbChartPie, 
+  TbChevronRight,
+  TbCreditCard,
+  TbPigMoney,
+  TbReportMoney,
+  TbShield,
+  TbArrowRight,
+  TbDeviceAnalytics,
+  TbBuildingBank,
+  TbCircleCheck
+} from 'react-icons/tb';
 import useAuth from '../../hooks/useAuth';
 import { isValidEmail, validatePassword } from '../../utils/validators';
+
+// Import the enhanced register form component
+import RegisterFormEnhanced from './RegisterFormEnhanced';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +27,8 @@ const Register = () => {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const { register, isAuthenticated, error: authError } = useAuth();
   const navigate = useNavigate();
@@ -82,164 +98,190 @@ const Register = () => {
     }
   };
   
+  const features = [
+    { icon: <TbPigMoney className="h-6 w-6" />, title: "Smart Budgeting", description: "Set and track budgets with intelligent categorization" },
+    { icon: <TbCreditCard className="h-6 w-6" />, title: "Financial Sources", description: "Connect and manage all your accounts in one place" },
+    { icon: <TbReportMoney className="h-6 w-6" />, title: "Wealth Insights", description: "Visualize your net worth and financial growth" },
+    { icon: <TbShield className="h-6 w-6" />, title: "Secure & Private", description: "Bank-level security with your data always protected" }
+  ];
+
+
+  const navigateToLogin = () => {
+    navigate('/login');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <TbChartPie className="h-12 w-12 text-primary-600" />
-        </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create a new account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-            sign in to your existing account
-          </Link>
-        </p>
+    <div className="min-h-screen flex flex-col lg:flex-row overflow-hidden relative">
+      {/* Premium background effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 z-0"></div>
+      
+      {/* Animated gradient overlay */}
+      <div className="absolute inset-0 opacity-40 z-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 via-indigo-600/10 to-purple-800/20 animate-pulse-slow"></div>
+        <div className="absolute bottom-0 right-0 w-3/4 h-3/4 bg-gradient-to-tl from-primary-600/20 via-transparent to-transparent rounded-full filter blur-3xl"></div>
+        <div className="absolute top-1/4 right-1/4 w-1/2 h-1/2 bg-gradient-to-br from-primary-400/10 via-transparent to-transparent rounded-full filter blur-3xl"></div>
       </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Name field */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full name
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <TbUser className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
-                  placeholder="John Doe"
-                />
+      
+      {/* Subtle grid pattern overlay */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 z-0"></div>
+      
+      {/* Left side - Content */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden z-10 pl-10">
+        <div className="relative w-full h-full flex flex-col justify-between p-12">
+          {/* Top section with logo and headline */}
+          <div className="pt-8 pl-6">
+            <div className="flex items-center space-x-3 mb-10">
+              <div className="p-3 bg-gradient-to-br from-primary-500/30 to-primary-700/30 rounded-2xl backdrop-blur-xl shadow-xl border border-primary-500/20">
+                <TbChartPie className="h-8 w-8 text-primary-300" />
               </div>
-              {errors.name && (
-                <p className="mt-2 text-sm text-red-600">{errors.name}</p>
-              )}
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">FinanceFlow</h1>
             </div>
-
-            {/* Email field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <TbMail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
-                  placeholder="you@example.com"
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-600">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Password field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <TbLock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
-                  placeholder="••••••••"
-                />
-              </div>
-              {errors.password && (
-                <p className="mt-2 text-sm text-red-600">{errors.password}</p>
-              )}
-            </div>
-
-            {/* Confirm Password field */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <TbLock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border ${
-                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
-                  placeholder="••••••••"
-                />
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
-              )}
-            </div>
-
-            {/* Auth error message */}
-            {authError && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      {authError}
-                    </h3>
+            
+            <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight max-w-3xl">
+              Start tracking your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-300 to-primary-200">financial journey</span> today
+            </h2>
+            
+            <p className="text-xl text-white/80 mb-10 max-w-xl">
+              Join thousands of users who are already mastering their finances with our intuitive platform designed for everyone.
+            </p>
+            
+           
+          </div>
+          
+          {/* Middle section with features */}
+          <div className="space-y-6 mb-14">
+            <h3 className="text-xl font-semibold text-white/90 mb-4">Why choose FinanceFlow?</h3>
+            <div className="grid grid-cols-2 gap-6">
+              {features.map((feature, index) => (
+                <div 
+                  key={index} 
+                  className="flex flex-col p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/8 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-900/20"
+                >
+                  <div className="p-3 bg-gradient-to-br from-primary-500/20 to-primary-700/20 rounded-xl backdrop-blur-md w-fit mb-4 border border-primary-500/20">
+                    {feature.icon}
                   </div>
+                  <h3 className="font-semibold text-white text-lg mb-2">{feature.title}</h3>
+                  <p className="text-white/70 text-sm">{feature.description}</p>
                 </div>
-              </div>
-            )}
-
-            {/* Submit button */}
-            <div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+              ))}
+            </div>
+          </div>
+          
+          {/* Bottom section CTA */}
+          <div className="mb-8">
+            
+            {/* CTA */}
+            <div className="flex items-center">
+              <p className="text-white/80 mr-4">
+                Already have an account?
+              </p>
+              <button 
+                onClick={navigateToLogin} 
+                className="flex items-center px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-600 hover:to-primary-500 text-white rounded-xl transition-all duration-300 shadow-lg shadow-primary-900/30 hover:shadow-primary-900/50 font-medium"
               >
-                {isSubmitting ? 'Creating account...' : 'Create account'}
+                Sign in <TbArrowRight className="ml-2 h-4 w-4" />
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
+      
+      {/* Right side - Enhanced Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center mt-20 lg:mt-0 p-4 sm:p-6 lg:p-8 relative z-10">
+        {/* Decorative elements */}
+        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br from-primary-600/20 to-primary-400/50 rounded-full filter blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-gradient-to-tr from-primary-600/40 to-primary-400/50 rounded-full filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
+        
+        {/* Use the enhanced register form component */}
+        <RegisterFormEnhanced 
+          formData={formData}
+          errors={errors}
+          isSubmitting={isSubmitting}
+          showPassword={showPassword}
+          showConfirmPassword={showConfirmPassword}
+          isFormFocused={false}
+          authError={authError}
+          handleChange={handleChange}
+          setShowPassword={setShowPassword}
+          setShowConfirmPassword={setShowConfirmPassword}
+          handleSubmit={handleSubmit}
+          navigateToLogin={navigateToLogin}
+        />
+        
+        {/* Mobile features - only visible on small screens */}
+        <div className="lg:hidden mt-12 space-y-6 max-w-md">
+          <h3 className="text-xl font-semibold text-white/90 text-center">Why choose FinanceFlow?</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {features.slice(0, 2).map((feature, index) => (
+              <div 
+                key={index} 
+                className="flex items-start space-x-3 p-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10"
+              >
+                <div className="p-2 bg-gradient-to-br from-primary-500/20 to-primary-700/20 rounded-lg backdrop-blur-md border border-primary-500/20">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-base">{feature.title}</h3>
+                  <p className="text-white/70 text-xs">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Mobile CTA */}
+          <div className="hidden lg:flex flex-col text-center pt-4">
+            <p className="text-white/80 mb-4">
+              Already have an account?
+            </p>
+            <button 
+              onClick={navigateToLogin} 
+              className="flex items-center px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-600 hover:to-primary-500 text-white rounded-xl transition-all duration-300 shadow-lg shadow-primary-900/30 hover:shadow-primary-900/50 font-medium mx-auto"
+            >
+              Sign in <TbArrowRight className="ml-2 h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* CSS for animations and patterns */}
+      <style jsx>{`
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
+        @keyframes pulse-slow {
+          0% {
+            opacity: 0.4;
+          }
+          50% {
+            opacity: 0.7;
+          }
+          100% {
+            opacity: 0.4;
+          }
+        }
+        
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 8s infinite ease-in-out;
+        }
+        
+        .bg-grid-pattern {
+          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
     </div>
   );
-};
+}
 
 export default Register;

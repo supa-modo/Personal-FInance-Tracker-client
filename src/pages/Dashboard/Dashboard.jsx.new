@@ -1,0 +1,204 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  TbPlus, 
+  TbArrowUpRight, 
+  TbArrowDownRight, 
+  TbCurrencyDollar,
+  TbChartLine,
+  TbWallet,
+  TbRefresh,
+  TbChevronRight,
+  TbCreditCard,
+  TbPigMoney,
+  TbBuildingBank,
+  TbChartBar,
+  TbCalendarStats,
+  TbTrendingUp,
+  TbAlertCircle,
+  TbEye,
+  TbSettings
+} from 'react-icons/tb';
+import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area, BarChart, Bar } from 'recharts';
+import MainLayout from '../../components/layout/MainLayout';
+import useFinancial from '../../hooks/useFinancial';
+import { formatCurrency, formatDate, getRelativeTimeString } from '../../utils/formatters';
+
+const Dashboard = () => {
+  const { 
+    financialSources, 
+    loading, 
+    error, 
+    getNetWorth,
+    getHistoricalNetWorth
+  } = useFinancial();
+  
+  const [netWorth, setNetWorth] = useState(0);
+  const [historicalData, setHistoricalData] = useState([]);
+  const [timePeriod, setTimePeriod] = useState('month');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showWelcomeCard, setShowWelcomeCard] = useState(true);
+  
+  useEffect(() => {
+    if (!loading) {
+      // Calculate net worth
+      const worth = getNetWorth();
+      setNetWorth(worth);
+      
+      // Get historical data
+      const history = getHistoricalNetWorth(timePeriod);
+      setHistoricalData(history);
+    }
+  }, [loading, financialSources, timePeriod, getNetWorth, getHistoricalNetWorth]);
+  
+  // Get active financial sources
+  const activeSources = financialSources.filter(source => source.isActive);
+  
+  // Get the latest balance for each source
+  const sourceData = activeSources.map(source => {
+    const updates = source.updates || [];
+    const latestUpdate = updates.length > 0 
+      ? updates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] 
+      : null;
+    
+    // Get previous update for comparison
+    const previousUpdate = updates.length > 1
+      ? updates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[1]
+      : null;
+    
+    // Calculate change
+    const currentBalance = latestUpdate ? parseFloat(latestUpdate.balance) : 0;
+    const previousBalance = previousUpdate ? parseFloat(previousUpdate.balance) : 0;
+    const change = currentBalance - previousBalance;
+    const changePercentage = previousBalance !== 0 ? (change / previousBalance) * 100 : 0;
+    
+    return {
+      id: source.id,
+      name: source.name,
+      type: source.type,
+      colorCode: source.colorCode,
+      balance: currentBalance,
+      lastUpdated: latestUpdate ? latestUpdate.createdAt : null,
+      change,
+      changePercentage,
+      isPositive: change >= 0,
+    };
+  });
+  
+  // Calculate total assets
+  const totalAssets = sourceData.reduce((sum, source) => sum + source.balance, 0);
+  
+  // Prepare data for pie chart
+  const pieChartData = sourceData.map(source => ({
+    name: source.name,
+    value: source.balance,
+    color: source.colorCode,
+  }));
+  
+  // Prepare data for line chart
+  const lineChartData = historicalData.map(item => ({
+    date: formatDate(item.date, { month: 'short', day: 'numeric' }),
+    total: item.total,
+  }));
+  
+  // Generate monthly data for area chart
+  const generateMonthlyData = () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentMonth = new Date().getMonth();
+    
+    return months.slice(0, currentMonth + 1).map((month, index) => {
+      // Use actual data if available, otherwise generate sample data
+      const monthData = historicalData.find(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getMonth() === index;
+      });
+      
+      return {
+        name: month,
+        value: monthData ? monthData.total : Math.random() * 5000 + 5000,
+      };
+    });
+  };
+  
+  const monthlyData = generateMonthlyData();
+  
+  // Calculate change from previous period
+  const calculateChange = () => {
+    if (historicalData.length < 2) return { amount: 0, percentage: 0, isPositive: true };
+    
+    const currentTotal = historicalData[historicalData.length - 1]?.total || 0;
+    const previousTotal = historicalData[0]?.total || 0;
+    
+    const change = currentTotal - previousTotal;
+    const percentage = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;
+    
+    return {
+      amount: change,
+      percentage,
+      isPositive: change >= 0,
+    };
+  };
+  
+  const change = calculateChange();
+  
+  // Get financial source types for distribution chart
+  const typeDistribution = activeSources.reduce((acc, source) => {
+    const type = source.type;
+    const updates = source.updates || [];
+    const latestUpdate = updates.length > 0 
+      ? updates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] 
+      : null;
+    const balance = latestUpdate ? parseFloat(latestUpdate.balance) : 0;
+    
+    if (!acc[type]) {
+      acc[type] = {
+        type: getTypeLabel(source.type),
+        value: 0,
+        color: getTypeColor(source.type),
+      };
+    }
+    
+    acc[type].value += balance;
+    return acc;
+  }, {});
+  
+  const typeDistributionData = Object.values(typeDistribution);
+  
+  // Helper function to get type label
+  function getTypeLabel(type) {
+    switch (type) {
+      case 'BANK_ACCOUNT': return 'Bank Account';
+      case 'MONEY_MARKET': return 'Money Market';
+      case 'STOCKS': return 'Stocks';
+      case 'MPESA': return 'M-Pesa';
+      case 'SACCO': return 'SACCO';
+      case 'OTHER': return 'Other';
+      default: return type;
+    }
+  }
+  
+  // Helper function to get type color
+  function getTypeColor(type) {
+    switch (type) {
+      case 'BANK_ACCOUNT': return '#4CAF50';
+      case 'MONEY_MARKET': return '#2196F3';
+      case 'STOCKS': return '#FF5722';
+      case 'MPESA': return '#9C27B0';
+      case 'SACCO': return '#FFC107';
+      case 'OTHER': return '#607D8B';
+      default: return '#9E9E9E';
+    }
+  }
+  
+  // Helper function to get type icon
+  function getTypeIcon(type) {
+    switch (type) {
+      case 'BANK_ACCOUNT': return <TbBuildingBank className="h-5 w-5 text-white" />;
+      case 'MONEY_MARKET': return <TbPigMoney className="h-5 w-5 text-white" />;
+      case 'STOCKS': return <TbTrendingUp className="h-5 w-5 text-white" />;
+      case 'MPESA': return <TbCreditCard className="h-5 w-5 text-white" />;
+      case 'SACCO': return <TbWallet className="h-5 w-5 text-white" />;
+      case 'OTHER': return <TbCurrencyDollar className="h-5 w-5 text-white" />;
+      default: return <TbCurrencyDollar className="h-5 w-5 text-white" />;
+    }
+  }
