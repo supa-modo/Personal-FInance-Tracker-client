@@ -291,7 +291,7 @@ const LoginFormEnhanced = ({
           </div>
 
           {/* Success message */}
-          {isAuthenticated && (
+          {/* {isAuthenticated && (
             <div className="rounded-xl bg-green-500/10 backdrop-blur-sm p-4 border border-green-500/30 animate-pulse">
               <p className="text-sm font-medium text-green-200 flex items-center">
                 <svg
@@ -310,7 +310,7 @@ const LoginFormEnhanced = ({
                 Successfully logged in!
               </p>
             </div>
-          )}
+          )} */}
 
           {/* Register link */}
           <div className="text-center pt-2">

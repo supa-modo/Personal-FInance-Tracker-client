@@ -15,6 +15,7 @@ import {
 // Import the enhanced login form component
 import LoginFormEnhanced from './LoginFormEnhanced';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -26,8 +27,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isFormFocused, setIsFormFocused] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authError, setAuthError] = useState(null);
+  
+  // Use the authentication hook
+  const { login, isAuthenticated, error: authError } = useAuth();
   const navigate = useNavigate();
   
   // Email validation function
@@ -74,18 +76,14 @@ const Login = () => {
     if (validateForm()) {
       try {
         setIsSubmitting(true);
-        // Simulate authentication delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // Mock login logic
-        if (formData.email === 'demo@example.com' && formData.password === 'password') {
-          setIsAuthenticated(true);
-          setAuthError(null);
-        } else {
-          setAuthError('Invalid email or password');
-        }
+        // Use the login function from useAuth hook
+        await login(formData.email, formData.password);
+        
+        // If login is successful, navigate to dashboard
+        navigate('/');
       } catch (error) {
-        setAuthError('An error occurred during sign in');
+        // Error handling is already managed by the useAuth hook
         console.error('Login error:', error);
       } finally {
         setIsSubmitting(false);

@@ -1,15 +1,30 @@
 /**
  * Format a number as currency
  * @param {number} amount - The amount to format
- * @param {string} currency - The currency code (default: USD)
+ * @param {Object} options - Formatting options
+ * @param {string} options.currency - The currency code (default: KES)
+ * @param {string} options.notation - The notation to use (default: standard)
  * @returns {string} - The formatted currency string
  */
-export const formatCurrency = (amount, currency = 'KES') => {
+export const formatCurrency = (amount, options = {}) => {
+  // Handle case where amount is not a number
+  if (amount === undefined || amount === null) {
+    return '—';
+  }
+  
+  const {
+    currency = 'KES',
+    notation = 'standard',
+    minimumFractionDigits = 2,
+    maximumFractionDigits = 2
+  } = options;
+  
   return new Intl.NumberFormat('en-KE', {
     style: 'currency',
     currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    notation,
+    minimumFractionDigits,
+    maximumFractionDigits,
   }).format(amount);
 };
 
