@@ -19,12 +19,12 @@ import { formatCurrency } from '../../../utils/formatters';
 
 const DashboardCharts = ({ lineChartData, pieChartData }) => {
   return (
-    <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="mt-8 grid grid-cols-1 gap-0 md:gap-6 lg:grid-cols-2">
       {/* Net Worth Trend Chart */}
-      <div className="bg-slate-800/60 shadow-xl rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
-        <div className="px-6 py-5 border-b border-slate-700/50">
+      <div className="bg-slate-800/60 shadow-xl rounded-t-3xl md:rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
+        <div className="px-4 md:px-6 py-5 border-b border-slate-700/50">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Net Worth Trend</h2>
+            <h2 className="text-lg font-semibold text-primary-500">Net Worth Trend</h2>
             <div className="flex items-center space-x-2">
               <button className="p-1.5 rounded-md hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors">
                 <TbEye className="h-5 w-5" />
@@ -35,7 +35,7 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
             </div>
           </div>
         </div>
-        <div className="px-6 py-4">
+        <div className="px-2.5 md:px-6 py-4">
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
@@ -91,10 +91,10 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
       </div>
 
       {/* Asset Distribution Chart */}
-      <div className="bg-slate-800/60 shadow-xl rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
+      <div className="bg-slate-800/60 shadow-xl md:rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
         <div className="px-6 py-5 border-b border-slate-700/50">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Asset Distribution</h2>
+            <h2 className="text-lg font-semibold text-primary-500">Asset Distribution</h2>
             <div className="flex items-center space-x-2">
               <button className="p-1.5 rounded-md hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors">
                 <TbEye className="h-5 w-5" />

@@ -13,9 +13,13 @@ import {
   TbBell,
   TbSettings,
   TbChartBar,
-  TbCalendarStats
+  TbCalendarStats,
+  TbHome2
 } from 'react-icons/tb';
 import useAuth from '../../hooks/useAuth';
+import { PiUserDuotone } from 'react-icons/pi';
+import { MdSpaceDashboard } from "react-icons/md";
+import { LuLogOut } from 'react-icons/lu';
 
 const MainLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -42,8 +46,8 @@ const MainLayout = ({ children }) => {
   };
 
   const navigationItems = [
-    { path: '/', label: 'Dashboard', icon: <TbHome className="w-5 h-5" /> },
-    { path: '/financial-sources', label: 'Financial Sources', icon: <TbWallet className="w-5 h-5" /> },
+    { path: '/', label: 'Dashboard', icon: <MdSpaceDashboard size={20} /> },
+    { path: '/financial-sources', label: 'Financial Sources', icon: <TbWallet size={20} /> },
   ];
 
 
@@ -63,7 +67,7 @@ const MainLayout = ({ children }) => {
       <div className="absolute inset-0 bg-grid-pattern opacity-3 z-0"></div>
 
       {/* Header */}
-      <header className="bg-slate-800/60 backdrop-blur-md border-b border-slate-700/50 fixed w-full z-10 shadow-lg">
+      <header className="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/50 fixed w-full z-30 shadow-lg">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Logo and mobile menu button */}
@@ -98,53 +102,50 @@ const MainLayout = ({ children }) => {
 
             {/* User profile and mobile menu button */}
             <div className="flex items-center space-x-4">
-              {/* Search button */}
-              <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors">
-                <TbSearch className="h-5 w-5" />
-              </button>
               
-              {/* Notifications button */}
-              <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors">
-                <TbBell className="h-5 w-5" />
-              </button>
-              
-              {/* Settings button */}
-              <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors">
-                <TbSettings className="h-5 w-5" />
-              </button>
               
               {/* Profile dropdown */}
               <div className="relative">
                 <div>
                   <button
                     type="button"
-                    className="flex items-center max-w-xs rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-slate-800 p-1.5 hover:bg-slate-700/50 transition-colors"
+                    className="flex items-center max-w-xs rounded-full text-sm focus:outline-none  p-1.5 hover:bg-slate-700/50 transition-colors"
                     id="user-menu"
                     aria-expanded="false"
                     aria-haspopup="true"
                     onClick={toggleProfileMenu}
                   >
                     <span className="sr-only">Open user menu</span>
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white shadow-lg shadow-primary-900/30">
-                      <TbUser className="h-5 w-5" />
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white shadow-lg shadow-primary-900/30">
+                      <PiUserDuotone className="h-5 w-5" />
                     </div>
-                    <span className="ml-2 text-white hidden md:block">{user?.name}</span>
-                    <TbChevronDown className="ml-1 h-4 w-4 text-slate-400 hidden md:block" />
+                    <span className="ml-2.5 text-gray-300 font-semibold hidden md:block">{user?.name}</span>
+                    <TbChevronDown className="ml-2 h-4 w-4 text-slate-400 hidden md:block" />
                   </button>
                 </div>
 
                 {/* Profile dropdown menu */}
                 {isProfileMenuOpen && (
                   <div
-                    className="origin-top-right absolute right-0 mt-2 w-48 rounded-xl shadow-lg bg-slate-800 border border-slate-700/50 backdrop-blur-md focus:outline-none overflow-hidden"
+                    className="origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-slate-800 border border-slate-700/50 backdrop-blur-md focus:outline-none overflow-hidden"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
                   >
-                    <div className="py-1" role="none">
+                    <div className="" role="none">
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
+                        className="w-full text-left block px-4 py-2 text-sm text-slate-300 hover:bg-primary-600/40 transition-colors"
+                        role="menuitem"
+                      >
+                        <div className="flex items-center">
+                          <PiUserDuotone className="mr-2 h-4 w-4" />
+                          Profile
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left block px-4 py-2 text-sm text-slate-300 hover:bg-red-600/20 transition-colors"
                         role="menuitem"
                       >
                         <div className="flex items-center">
@@ -203,7 +204,7 @@ const MainLayout = ({ children }) => {
                 }}
                 className="flex w-full items-center pl-3 pr-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-700/30 hover:text-white border-l-4 border-transparent transition-colors"
               >
-                <TbLogout className="mr-3 w-5 h-5" />
+                <LuLogOut size={20} className="mr-3" />
                 Sign out
               </button>
             </div>
@@ -213,7 +214,7 @@ const MainLayout = ({ children }) => {
 
       {/* Main content */}
       <main className="flex-1 pt-16 relative z-10">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-screen-2xl mx-auto px-0 md:px-6 lg:px-8 py-6">
           {children}
         </div>
       </main>

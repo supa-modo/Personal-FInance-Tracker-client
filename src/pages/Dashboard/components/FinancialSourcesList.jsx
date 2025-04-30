@@ -9,16 +9,16 @@ import { formatCurrency, getRelativeTimeString } from '../../../utils/formatters
 
 const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
   return (
-    <div className="mt-8 bg-slate-800/60 shadow-xl rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
-      <div className="px-6 py-5 border-b border-slate-700/50">
+    <div className="md:mt-8 bg-slate-800/60 shadow-xl md:rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
+      <div className="px-4 md:px-6 py-5 border-b border-slate-700/50">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Financial Sources</h2>
+          <h2 className="text-lg font-semibold text-primary-500">Financial Sources</h2>
           <Link
             to="/financial-sources/new"
             className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 shadow-lg shadow-primary-900/30"
           >
             <TbPlus className="-ml-1 mr-1 h-4 w-4" />
-            Add New
+            Add New Source
           </Link>
         </div>
       </div>
@@ -26,7 +26,7 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
         <div className="flow-root">
           <ul className="divide-y divide-slate-700/30">
             {sourceData.map((source) => (
-              <li key={source.id} className="px-6 py-5 hover:bg-slate-700/30 transition duration-150 ease-in-out">
+              <li key={source.id} className="px-3 md:px-6 py-5 hover:bg-slate-700/30 transition duration-150 ease-in-out">
                 <Link to={`/financial-sources/${source.id}`} className="block">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
@@ -83,7 +83,7 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
             <div className="mt-6">
               <Link
                 to="/financial-sources/new"
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 shadow-lg shadow-primary-900/30"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-500 transition-all duration-300 shadow-lg shadow-primary-900/30"
               >
                 <TbPlus className="-ml-1 mr-2 h-5 w-5" />
                 Add Financial Source

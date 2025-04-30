@@ -2,7 +2,7 @@ import React from 'react';
 
 const DashboardTabs = ({ activeTab, setActiveTab }) => {
   return (
-    <div className="mb-6 border-b border-slate-700/50">
+    <div className="px-4 md:px-0 mb-6 border-b border-slate-700/50">
       <nav className="-mb-px flex space-x-8">
         <button
           onClick={() => setActiveTab('overview')}

@@ -4,17 +4,15 @@ import MainLayout from '../../components/layout/MainLayout';
 import useFinancial from '../../hooks/useFinancial';
 
 // Import components
-import SourceHeader from './components/SourceHeader';
-import SourceDetailsCard from './components/SourceDetailsCard';
-import BalanceChart from './components/BalanceChart';
-import BalanceUpdates from './components/BalanceUpdates';
-import DeleteModal from './components/DeleteModal';
-import UpdateBalanceModal from './components/UpdateBalanceModal';
-import EditFinancialSourceModal from './components/EditFinancialSourceModal';
-
-// Import utilities
-import { getChartData, getLatestBalance } from './utils.jsx';
+import SourceHeaderEnhanced from './components/SourceHeaderEnhanced';
+import SourceDetailsCardEnhanced from './components/SourceDetailsCardEnhanced';
+import BalanceChartEnhanced from './components/BalanceChartEnhanced';
+import BalanceUpdatesEnhanced from './components/BalanceUpdatesEnhanced';
+import DeleteModalEnhanced from './components/DeleteModalEnhanced';
+import UpdateBalanceModalEnhanced from './components/UpdateBalanceModalEnhanced';
+import EditFinancialSourceModalEnhanced from './components/EditFinancialSourceModalEnhanced';
 import { TbAlertCircle, TbRefresh, TbArrowLeft } from 'react-icons/tb';
+import SourcesHeader from './components/SourcesHeader';
 
 const FinancialSourceDetail = () => {
   const { id } = useParams();
@@ -203,13 +201,41 @@ const FinancialSourceDetail = () => {
     );
   }
   
-  // Prepare chart data
+  // Prepare chart data for the balance chart
+  const getChartData = (source) => {
+    if (!source || !source.updates || source.updates.length === 0) {
+      return [];
+    }
+    
+    // Sort updates by date
+    return [...source.updates]
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .map(update => ({
+        date: update.date,
+        balance: update.balance
+      }));
+  };
+  
+  // Get type label for display
+  const getTypeLabel = (type) => {
+    const typeMap = {
+      'BANK_ACCOUNT': 'Bank Account',
+      'MONEY_MARKET': 'Money Market Fund',
+      'STOCKS': 'Stocks',
+      'MPESA': 'M-Pesa',
+      'SACCO': 'SACCO',
+      'OTHER': 'Other'
+    };
+    
+    return typeMap[type] || type;
+  };
+  
   const chartData = getChartData(source);
   
   return (
     <MainLayout>
       {/* Source header with actions */}
-      <SourceHeader 
+      <SourceHeaderEnhanced 
         source={source} 
         id={id} 
         handleUpdateClick={handleUpdateClick} 
@@ -218,21 +244,21 @@ const FinancialSourceDetail = () => {
       />
 
       {/* Main content */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className=" grid grid-cols-1 gap-0 md:gap-6 lg:grid-cols-2">
         {/* Source details card */}
-        <SourceDetailsCard source={source} getLatestBalance={() => getLatestBalance(source)} />
+        <SourceDetailsCardEnhanced source={source} getTypeLabel={getTypeLabel} />
         
         {/* Balance chart */}
-        <BalanceChart chartData={chartData} />
+        <BalanceChartEnhanced chartData={chartData} />
       </div>
       
       {/* Balance updates list */}
-      <div className="mt-6">
-        <BalanceUpdates source={source} />
+      <div className="">
+        <BalanceUpdatesEnhanced source={source} />
       </div>
       
       {/* Delete confirmation modal */}
-      <DeleteModal 
+      <DeleteModalEnhanced 
         isOpen={isDeleteModalOpen} 
         source={source} 
         onClose={() => setIsDeleteModalOpen(false)} 
@@ -240,7 +266,7 @@ const FinancialSourceDetail = () => {
       />
       
       {/* Update balance modal */}
-      <UpdateBalanceModal 
+      <UpdateBalanceModalEnhanced 
         isOpen={isUpdateModalOpen} 
         updateForm={updateForm} 
         updateErrors={updateErrors} 
@@ -250,7 +276,7 @@ const FinancialSourceDetail = () => {
       />
       
       {/* Edit financial source modal */}
-      <EditFinancialSourceModal 
+      <EditFinancialSourceModalEnhanced 
         isOpen={isEditModalOpen} 
         source={source} 
         onClose={() => setIsEditModalOpen(false)} 

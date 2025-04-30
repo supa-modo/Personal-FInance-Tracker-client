@@ -8,11 +8,11 @@ import {
 
 const QuickActions = () => {
   return (
-    <div className="mt-8 bg-slate-800/60 shadow-xl rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
-      <div className="px-6 py-5 border-b border-slate-700/50">
+    <div className="mt-8 bg-slate-800/60 shadow-xl rounded-t-2xl md:rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
+      <div className="px-4 md:px-6 py-4 md:py-5 border-b border-slate-700/50">
         <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
       </div>
-      <div className="p-6">
+      <div className="px-3 py-4 md:p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link
             to="/financial-sources"
