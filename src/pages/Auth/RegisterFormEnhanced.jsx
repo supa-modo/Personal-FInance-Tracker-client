@@ -246,7 +246,7 @@ const RegisterFormEnhanced = ({
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 pr-8 flex items-center text-white/60 hover:text-white transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -307,7 +307,7 @@ const RegisterFormEnhanced = ({
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 pr-8 flex items-center text-white/60 hover:text-white transition-colors"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
@@ -352,10 +352,10 @@ const RegisterFormEnhanced = ({
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
 
               {/* Button content */}
-              <span className="relative flex items-center">
+              <span className="relative flex items-center text-gray-300 font-medium">
                 {isSubmitting ? (
                   <>
-                    <TbLoader2 className="animate-spin mr-2 h-4 w-4 text-white" />
+                    <TbLoader2 className="animate-spin mr-2 h-4 w-4 " />
                     Creating account...
                   </>
                 ) : (

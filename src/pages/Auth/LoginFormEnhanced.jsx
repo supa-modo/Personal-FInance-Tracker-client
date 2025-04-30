@@ -274,10 +274,10 @@ const LoginFormEnhanced = ({
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
 
               {/* Button content */}
-              <span className="relative flex items-center">
+              <span className="relative font-medium text-gray-300 flex items-center">
                 {isSubmitting ? (
                   <>
-                    <TbLoader2 className="animate-spin mr-2 h-4 w-4 text-white" />
+                    <TbLoader2 className="animate-spin mr-2 h-4 w-4 " />
                     Signing in...
                   </>
                 ) : (

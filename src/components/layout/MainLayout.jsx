@@ -8,13 +8,8 @@ import {
   TbMenu2, 
   TbX,
   TbChevronDown,
-  TbUser,
-  TbSearch,
-  TbBell,
+  TbUserCircle,
   TbSettings,
-  TbChartBar,
-  TbCalendarStats,
-  TbHome2
 } from 'react-icons/tb';
 import useAuth from '../../hooks/useAuth';
 import { PiUserDuotone } from 'react-icons/pi';
@@ -133,16 +128,17 @@ const MainLayout = ({ children }) => {
                     aria-labelledby="user-menu"
                   >
                     <div className="" role="none">
-                      <button
-                        onClick={handleLogout}
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="w-full text-left block px-4 py-2 text-sm text-slate-300 hover:bg-primary-600/40 transition-colors"
                         role="menuitem"
                       >
                         <div className="flex items-center">
-                          <PiUserDuotone className="mr-2 h-4 w-4" />
-                          Profile
+                          <TbUserCircle className="mr-2 h-4 w-4" />
+                          Profile Settings
                         </div>
-                      </button>
+                      </Link>
                       <button
                         onClick={handleLogout}
                         className="w-full text-left block px-4 py-2 text-sm text-slate-300 hover:bg-red-600/20 transition-colors"
@@ -197,6 +193,14 @@ const MainLayout = ({ children }) => {
                   {item.label}
                 </Link>
               ))}
+              <Link
+                to="/profile"
+                onClick={closeMobileMenu}
+                className="flex w-full items-center pl-3 pr-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-700/30 hover:text-white border-l-4 border-transparent transition-colors"
+              >
+                <TbUserCircle size={20} className="mr-3" />
+                Profile Settings
+              </Link>
               <button
                 onClick={() => {
                   closeMobileMenu();

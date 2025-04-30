@@ -16,6 +16,16 @@ axios.defaults.withCredentials = true;
  * @param {string} password - User password
  * @returns {Promise} - Promise with user data
  */
+/**
+ * Logs in a user with the specified email and password.
+ * Sends a POST request to the authentication endpoint and
+ * stores the user data in localStorage if successful.
+ * 
+ * @param {string} email - User's email address.
+ * @param {string} password - User's password.
+ * @returns {Promise<Object>} - Promise resolving to user data.
+ * @throws {Error} - Throws an error if login fails.
+ */
 export const login = async (email, password) => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, {
@@ -43,7 +53,8 @@ export const login = async (email, password) => {
  * @param {string} name - User name
  * @param {string} email - User email
  * @param {string} password - User password
- * @returns {Promise} - Promise with user data
+ * @returns {Promise<Object>} - Promise resolving to user data.
+ * @throws {Error} - Throws an error if registration fails.
  */
 export const register = async (name, email, password) => {
   try {
@@ -69,7 +80,8 @@ export const register = async (name, email, password) => {
 
 /**
  * Logout the current user
- * @returns {Promise} - Promise with success status
+ * @returns {Promise<Object>} - Promise resolving to success status.
+ * @throws {Error} - Throws an error if logout fails.
  */
 export const logout = async () => {
   try {
@@ -90,7 +102,8 @@ export const logout = async () => {
 
 /**
  * Get the current user from the API
- * @returns {Promise} - Promise with user data
+ * @returns {Promise<Object>} - Promise resolving to user data.
+ * @throws {Error} - Throws an error if user retrieval fails.
  */
 export const fetchCurrentUser = async () => {
   try {
@@ -128,7 +141,8 @@ export const getCurrentUser = () => {
  * @param {string} currentPassword - Current password
  * @param {string} newPassword - New password
  * @param {string} newPasswordConfirm - New password confirmation
- * @returns {Promise} - Promise with updated user data
+ * @returns {Promise<Object>} - Promise resolving to updated user data.
+ * @throws {Error} - Throws an error if password update fails.
  */
 export const updatePassword = async (currentPassword, newPassword, newPasswordConfirm) => {
   try {
@@ -147,5 +161,49 @@ export const updatePassword = async (currentPassword, newPassword, newPasswordCo
   } catch (error) {
     console.error('Password update failed:', error.response?.data?.message || error.message);
     throw new Error(error.response?.data?.message || 'Password update failed. Please try again.');
+  }
+};
+
+/**
+ * Update user profile information
+ * @param {object} profileData - Profile data with name and email
+ * @returns {Promise<Object>} - Promise resolving to updated user data.
+ * @throws {Error} - Throws an error if profile update fails.
+ */
+export const updateProfile = async (profileData) => {
+  try {
+    const response = await axios.patch(`${API_URL}/auth/update-profile`, profileData);
+    
+    if (response.data && response.data.data && response.data.data.user) {
+      localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
+      return response.data.data.user;
+    }
+    
+    throw new Error('Invalid response from server');
+  } catch (error) {
+    console.error('Profile update failed:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Profile update failed. Please try again.');
+  }
+};
+
+/**
+ * Update user notification settings
+ * @param {object} settingsData - Notification settings data
+ * @returns {Promise<Object>} - Promise resolving to updated user data.
+ * @throws {Error} - Throws an error if notification settings update fails.
+ */
+export const updateNotificationSettings = async (settingsData) => {
+  try {
+    const response = await axios.patch(`${API_URL}/auth/update-notification-settings`, settingsData);
+    
+    if (response.data && response.data.data && response.data.data.user) {
+      localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
+      return response.data.data.user;
+    }
+    
+    throw new Error('Invalid response from server');
+  } catch (error) {
+    console.error('Notification settings update failed:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Notification settings update failed. Please try again.');
   }
 };

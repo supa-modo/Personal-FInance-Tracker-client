@@ -16,14 +16,16 @@ import Register from './pages/Auth/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FinancialSourcesList from './pages/FinancialSources/FinancialSourcesList';
 import FinancialSourceDetail from './pages/FinancialSources/FinancialSourceDetail';
+import ProfilePage from './pages/Profile/ProfilePage';
 import NotFound from './pages/NotFound/NotFound';
+import { TbLoader2 } from 'react-icons/tb';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen"><TbLoader2 className='w-10 h-10 animate-spin'/></div>;
   }
   
   if (!isAuthenticated) {
@@ -57,6 +59,11 @@ function App() {
             <Route path="/financial-sources/:id" element={
               <ProtectedRoute>
                 <FinancialSourceDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             } />
             

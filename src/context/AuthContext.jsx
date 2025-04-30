@@ -102,17 +102,57 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Function to update user password
-  const updatePassword = async (currentPassword, newPassword, newPasswordConfirm) => {
+  const updatePassword = async (passwordData) => {
     try {
       setLoading(true);
       setError(null);
       
       // Call the update password service
       const updatedUser = await authService.updatePassword(
-        currentPassword,
-        newPassword,
-        newPasswordConfirm
+        passwordData.currentPassword,
+        passwordData.newPassword,
+        passwordData.newPasswordConfirm
       );
+      
+      // Update the state
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to update user profile
+  const updateProfile = async (profileData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Call the update profile service
+      const updatedUser = await authService.updateProfile(profileData);
+      
+      // Update the state
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to update notification settings
+  const updateNotificationSettings = async (settingsData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Call the update notification settings service
+      const updatedUser = await authService.updateNotificationSettings(settingsData);
       
       // Update the state
       setUser(updatedUser);
@@ -134,6 +174,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updatePassword,
+    updateProfile,
+    updateNotificationSettings,
     isAuthenticated: !!user,
   };
 
