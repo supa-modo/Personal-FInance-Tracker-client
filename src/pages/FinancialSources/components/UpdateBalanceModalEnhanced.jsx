@@ -4,7 +4,9 @@ import {
   TbCurrencyDollar, 
   TbAlertCircle,
   TbArrowUpRight,
-  TbArrowDownRight
+  TbArrowDownRight,
+  TbChartPie,
+  TbRefresh
 } from 'react-icons/tb';
 import { formatCurrency } from '../../../utils/formatters';
 
@@ -122,7 +124,7 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
   
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-center justify-center min-h-screen pt-4 text-center ">
         {/* Background overlay */}
         <div 
           className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" 
@@ -130,7 +132,7 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
         ></div>
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-slate-800/90 backdrop-blur-xl rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 border border-slate-700/50 relative">
+        <div className="inline-block align-bottom bg-slate-800/90 backdrop-blur-xl rounded-2xl w-full mx-3 md:mx-0 px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 border border-slate-700/50 relative">
           {/* Close button */}
           <div className="absolute top-3 right-3">
             <button
@@ -143,7 +145,7 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
           
           <div className="sm:flex sm:items-start mb-4">
             <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-900/50 sm:mx-0 sm:h-10 sm:w-10 border border-primary-700/50">
-              <TbCurrencyDollar className="h-6 w-6 text-primary-300" />
+              <TbChartPie className="h-6 w-6 text-primary-300" />
             </div>
             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
               <h3 className="text-lg leading-6 font-medium text-white">
@@ -151,7 +153,7 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
               </h3>
               <div className="mt-1">
                 <p className="text-sm text-slate-300">
-                  Update the balance for <span className="font-semibold text-white">{source?.name}</span>
+                  Update the balance for <span className="font-semibold text-primary-500">{source?.name}</span>
                 </p>
               </div>
             </div>
@@ -170,7 +172,7 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
             
             {/* Balance field */}
             <div>
-              <label htmlFor="balance" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="balance" className="block text-sm font-medium text-primary-500/80">
                 New Balance
               </label>
               <div className="mt-1 relative">
@@ -221,7 +223,7 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
             
             {/* Notes field */}
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="notes" className="block text-sm font-medium text-primary-500/80">
                 Notes (Optional)
               </label>
               <div className="mt-1">
@@ -249,7 +251,10 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
                 type="submit"
                 className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all duration-200"
               >
-                Update Balance
+                <div className='flex items-center'>
+                  <TbRefresh className="h-5 w-5 mr-2" />
+                  <span>Update Balance</span>
+                </div>
               </button>
             </div>
           </form>

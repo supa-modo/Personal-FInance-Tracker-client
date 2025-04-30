@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import * as authService from '../services/auth.service';
 
 // Create the authentication context
 export const AuthContext = createContext();
@@ -12,17 +13,23 @@ export const AuthProvider = ({ children }) => {
   // State for authentication error
   const [error, setError] = useState(null);
 
-  // Effect to check if the user is already logged in (from localStorage)
+  // Effect to check if the user is already logged in
   useEffect(() => {
     const checkLoggedIn = async () => {
       try {
-        // Check if there's a user in localStorage
-        const storedUser = localStorage.getItem('user-personal-finance');
-        
+        // First try to get user from localStorage for quick loading
+        const storedUser = authService.getCurrentUser();
         if (storedUser) {
-          // Parse the stored user
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
+          setUser(storedUser);
+        }
+        
+        // Then validate with the backend and get fresh data
+        const currentUser = await authService.fetchCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+        } else if (storedUser) {
+          // If backend says no user but we had one in localStorage, clear it
+          setUser(null);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
@@ -41,24 +48,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      // For now, we'll use dummy data
-      // In a real app, this would be an API call
-      if (email === 'user@example.com' && password === 'password') {
-        const userData = {
-          id: '1',
-          name: 'Test User',
-          email: 'user@example.com',
-        };
-        
-        // Store the user in localStorage
-        localStorage.setItem('user-personal-finance', JSON.stringify(userData));
-        
-        // Update the state
-        setUser(userData);
-        return userData;
-      } else {
-        throw new Error('Invalid email or password');
-      }
+      // Call the login service
+      const userData = await authService.login(email, password);
+      
+      // Update the state
+      setUser(userData);
+      return userData;
     } catch (error) {
       setError(error.message);
       throw error;
@@ -73,16 +68,8 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      // For now, we'll use dummy data
-      // In a real app, this would be an API call
-      const userData = {
-        id: '1',
-        name,
-        email,
-      };
-      
-      // Store the user in localStorage
-      localStorage.setItem('user-personal-finance', JSON.stringify(userData));
+      // Call the register service
+      const userData = await authService.register(name, email, password);
       
       // Update the state
       setUser(userData);
@@ -96,12 +83,46 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Function to handle user logout
-  const logout = () => {
-    // Remove the user from localStorage
-    localStorage.removeItem('user-personal-finance');
-    
-    // Update the state
-    setUser(null);
+  const logout = async () => {
+    try {
+      setLoading(true);
+      
+      // Call the logout service
+      await authService.logout();
+      
+      // Update the state
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still clear the user state even if API call fails
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to update user password
+  const updatePassword = async (currentPassword, newPassword, newPasswordConfirm) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Call the update password service
+      const updatedUser = await authService.updatePassword(
+        currentPassword,
+        newPassword,
+        newPasswordConfirm
+      );
+      
+      // Update the state
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Create the context value
@@ -112,6 +133,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updatePassword,
     isAuthenticated: !!user,
   };
 

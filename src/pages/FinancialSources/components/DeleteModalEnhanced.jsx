@@ -1,15 +1,15 @@
 import React from 'react';
-import { TbAlertTriangle, TbX } from 'react-icons/tb';
+import { TbAlertTriangle, TbTrash, TbX } from 'react-icons/tb';
 
 const DeleteModalEnhanced = ({ isOpen, onClose, onConfirm, sourceName }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-center justify-center min-h-screen px-4 pt-4 text-center">
         {/* Background overlay */}
         <div 
-          className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" 
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-[1.5px] transition-opacity" 
           onClick={onClose}
         ></div>
 
@@ -54,7 +54,11 @@ const DeleteModalEnhanced = ({ isOpen, onClose, onConfirm, sourceName }) => {
               className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm transition-all duration-200"
               onClick={onConfirm}
             >
-              Delete
+              <div className='flex items-center space-x-2'>
+                <TbTrash size={19}/>
+                <span>Delete Source</span>
+              </div>
+              
             </button>
           </div>
         </div>

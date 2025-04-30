@@ -12,7 +12,6 @@ import DeleteModalEnhanced from './components/DeleteModalEnhanced';
 import UpdateBalanceModalEnhanced from './components/UpdateBalanceModalEnhanced';
 import EditFinancialSourceModalEnhanced from './components/EditFinancialSourceModalEnhanced';
 import { TbAlertCircle, TbRefresh, TbArrowLeft } from 'react-icons/tb';
-import SourcesHeader from './components/SourcesHeader';
 
 const FinancialSourceDetail = () => {
   const { id } = useParams();
@@ -78,7 +77,7 @@ const FinancialSourceDetail = () => {
   // Handle update modal open
   const handleUpdateClick = () => {
     setUpdateForm({
-      balance: source.balance || getLatestBalance(source) || '',
+      balance: source.balance || '',
       notes: '',
     });
     setUpdateErrors({});
@@ -233,14 +232,15 @@ const FinancialSourceDetail = () => {
   const chartData = getChartData(source);
   
   return (
+    <>
     <MainLayout>
       {/* Source header with actions */}
       <SourceHeaderEnhanced 
         source={source} 
         id={id} 
-        handleUpdateClick={handleUpdateClick} 
-        handleDeleteClick={handleDeleteClick}
-        handleEditClick={handleEditClick}
+        onUpdateBalanceClick={handleUpdateClick} 
+        onDeleteClick={handleDeleteClick}
+        onEditClick={handleEditClick}
       />
 
       {/* Main content */}
@@ -257,32 +257,36 @@ const FinancialSourceDetail = () => {
         <BalanceUpdatesEnhanced source={source} />
       </div>
       
-      {/* Delete confirmation modal */}
-      <DeleteModalEnhanced 
-        isOpen={isDeleteModalOpen} 
-        source={source} 
-        onClose={() => setIsDeleteModalOpen(false)} 
-        onConfirm={handleDeleteConfirm} 
-      />
-      
-      {/* Update balance modal */}
-      <UpdateBalanceModalEnhanced 
-        isOpen={isUpdateModalOpen} 
-        updateForm={updateForm} 
-        updateErrors={updateErrors} 
-        onClose={() => setIsUpdateModalOpen(false)} 
-        onSubmit={handleUpdateSubmit} 
-        onChange={handleUpdateFormChange} 
-      />
-      
-      {/* Edit financial source modal */}
-      <EditFinancialSourceModalEnhanced 
-        isOpen={isEditModalOpen} 
-        source={source} 
-        onClose={() => setIsEditModalOpen(false)} 
-        onSubmit={handleEditSource} 
-      />
+     
     </MainLayout>
+
+     {/* Delete confirmation modal */}
+     <DeleteModalEnhanced 
+     isOpen={isDeleteModalOpen} 
+     source={source} 
+     onClose={() => setIsDeleteModalOpen(false)} 
+     onConfirm={handleDeleteConfirm} 
+   />
+   
+   {/* Update balance modal */}
+   <UpdateBalanceModalEnhanced 
+     isOpen={isUpdateModalOpen} 
+     updateForm={updateForm} 
+     updateErrors={updateErrors}
+     source={source}
+     onClose={() => setIsUpdateModalOpen(false)} 
+     onSubmit={handleUpdateSubmit} 
+     onChange={handleUpdateFormChange} 
+   />
+   
+   {/* Edit financial source modal */}
+   <EditFinancialSourceModalEnhanced 
+     isOpen={isEditModalOpen} 
+     source={source} 
+     onClose={() => setIsEditModalOpen(false)} 
+     onSubmit={handleEditSource} 
+   />
+   </>
   );
 };
 

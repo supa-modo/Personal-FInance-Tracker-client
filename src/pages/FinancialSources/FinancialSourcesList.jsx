@@ -23,12 +23,12 @@ import {
 } from 'react-icons/tb';
 import MainLayout from '../../components/layout/MainLayout';
 import useFinancial from '../../hooks/useFinancial';
-import SourcesHeader from './components/SourcesHeader';
 import SourcesFilter from './components/SourcesFilter';
 import SourcesList from './components/SourcesList';
 import AddFinancialSourceModalEnhanced from './components/AddFinancialSourceModalEnhanced';
 import DeleteModalEnhanced from './components/DeleteModalEnhanced';
 import EditFinancialSourceModalEnhanced from './components/EditFinancialSourceModalEnhanced';
+import SourcesHeader from './components/SourcesHeader';
 
 const FinancialSourcesList = () => {
   const { financialSources, loading, error, deleteFinancialSource, addFinancialSource, updateFinancialSource } = useFinancial();

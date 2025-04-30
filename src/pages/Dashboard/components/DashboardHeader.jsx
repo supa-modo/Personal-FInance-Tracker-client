@@ -4,7 +4,7 @@ import { TbPlus } from 'react-icons/tb';
 
 const DashboardHeader = ({ timePeriod, setTimePeriod }) => {
   return (
-    <div className="pb-5 px-4 md:px-0 mb-4 sm:flex sm:items-center sm:justify-between">
+    <div className="pb-4 px-4 md:px-0 md:mb-4 sm:flex sm:items-center sm:justify-between">
       <h1 className="text-3xl font-bold text-white ">Financial Dashboard</h1>
       <div className="mt-3 sm:mt-0 sm:ml-4 flex space-x-3">
         <div className="relative inline-block text-left">

@@ -10,7 +10,20 @@ import {
   TbWallet,
   TbCurrencyDollar
 } from 'react-icons/tb';
+import { FaSave } from "react-icons/fa";
 
+/**
+ * EditFinancialSourceModalEnhanced is a modal component that allows users to edit
+ * financial source details such as name, type, description, and color. It provides
+ * form validation and handles form state management with hooks. The modal is displayed
+ * when `isOpen` is true and can be closed using the `onClose` callback. On successful
+ * form submission, the `onEdit` callback is triggered with the updated form data.
+ *
+ * @param {boolean} isOpen - Controls the visibility of the modal.
+ * @param {function} onClose - Callback to close the modal.
+ * @param {function} onEdit - Callback to handle the form submission with updated data.
+ * @param {object} source - The financial source data to be edited.
+ */
 const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) => {
   const [formData, setFormData] = useState({
     id: '',
@@ -149,7 +162,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="name" className="block text-sm font-medium text-primary-500">
                 Name
               </label>
               <div className="mt-1 relative">
@@ -161,7 +174,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
                   onChange={handleChange}
                   className={`block w-full px-3 py-2.5 border ${
                     errors.name ? 'border-red-500' : 'border-slate-600'
-                  } bg-slate-800/50 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400`}
+                  } bg-slate-800/50 text-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400`}
                   placeholder="e.g., Savings Account"
                 />
                 {errors.name && (
@@ -177,7 +190,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
             
             {/* Type field */}
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="type" className="block text-sm font-medium text-primary-500">
                 Type
               </label>
               <div className="mt-1">
@@ -188,7 +201,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
                   onChange={handleChange}
                   className={`block w-full px-3 py-2.5 border ${
                     errors.type ? 'border-red-500' : 'border-slate-600'
-                  } bg-slate-800/50 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
+                  } bg-slate-800/50 text-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
                 >
                   {sourceTypes.map(type => (
                     <option key={type.value} value={type.value}>
@@ -204,7 +217,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
             
             {/* Description field */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="description" className="block text-sm font-medium text-primary-500">
                 Description (Optional)
               </label>
               <div className="mt-1">
@@ -214,14 +227,14 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
                   rows="3"
                   value={formData.description}
                   onChange={handleChange}
-                  className="block w-full px-3 py-2.5 border border-slate-600 bg-slate-800/50 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400"
+                  className="block w-full px-3 py-2.5 border border-slate-600 bg-slate-800/50 text-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400"
                   placeholder="Add a description for this financial source"
                 />
               </div>
             </div>
             
             {/* Color selection */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Color
               </label>
@@ -238,7 +251,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
                   />
                 ))}
               </div>
-            </div>
+            </div> */}
             
             {/* Active toggle */}
             <div className="flex items-center">
@@ -272,7 +285,10 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
                 type="submit"
                 className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all duration-200"
               >
-                Save Changes
+                <div className='flex items-center space-x-2'>
+                  <FaSave size={19}/>
+                  <span>Save Changes</span>
+                </div>
               </button>
             </div>
           </form>
