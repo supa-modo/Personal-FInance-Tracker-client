@@ -104,7 +104,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
   
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-center justify-center min-h-screen pt-4 text-center ">
         {/* Background overlay */}
         <div 
           className="fixed inset-0 bg-slate-900/80 backdrop-blur-[1.5px] transition-opacity" 
@@ -112,7 +112,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
         ></div>
 
         {/* Modal panel */}
-        <div className="inline-block align-middle bg-slate-800/90 justify-center backdrop-blur-xl rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 border border-slate-700/50 relative">
+        <div className="inline-block align-middle bg-slate-800/90 justify-center backdrop-blur-xl rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg sm:w-full mx-2.5 md:mx-0 sm:p-6 border border-slate-700/50 relative">
           {/* Close button */}
           <div className="absolute top-3 right-3">
             <button
