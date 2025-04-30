@@ -1,212 +1,116 @@
-/**
- * Base API service for making HTTP requests
- * Currently using localStorage for persistence until backend is implemented
- */
+import axios from "axios";
 
-// Base URL for API requests (will be used when backend is implemented)
-const API_URL = 'http://localhost:5000/api';
+// API base URL from environment variables or default
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 
-/**
- * Make a GET request
- * @param {string} endpoint - API endpoint
- * @returns {Promise} - Promise with response data
- */
-export const get = async (endpoint) => {
-  try {
-    // For now, simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Get data from localStorage based on endpoint
-    const key = getLocalStorageKey(endpoint);
-    const data = localStorage.getItem(key);
-    
-    return data ? JSON.parse(data) : null;
-  } catch (error) {
-    console.error(`GET request failed for ${endpoint}:`, error);
-    throw error;
-  }
-};
+// Token storage keys
+export const USER_KEY = "user-personal-finance";
 
-/**
- * Make a POST request
- * @param {string} endpoint - API endpoint
- * @param {object} data - Request data
- * @returns {Promise} - Promise with response data
- */
-export const post = async (endpoint, data) => {
-  try {
-    // For now, simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+// Configure axios to include credentials (cookies) for all requests
+axios.defaults.withCredentials = true;
+
+// Enable debug logging based on environment variable
+export const ENABLE_DEBUG_LOGGING = import.meta.env.VITE_ENABLE_DEBUG_LOGGING === "true";
+
+
+// Create axios instance with auth interceptors
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 15000, // 15 seconds
+});
+
+// Configure axios to include credentials (cookies)
+apiClient.defaults.withCredentials = true;
+
+// Add request interceptor for authentication
+apiClient.interceptors.request.use(
+  (config) => {
+    // We're using HttpOnly cookies for authentication, so no need to set Authorization header
+    // The browser will automatically include the cookies in the request
     
-    // Store data in localStorage based on endpoint
-    const key = getLocalStorageKey(endpoint);
-    
-    // For collection endpoints, append to existing data
-    if (isCollectionEndpoint(endpoint)) {
-      const existingData = localStorage.getItem(key);
-      const collection = existingData ? JSON.parse(existingData) : [];
-      
-      // Add ID and timestamps
-      const newItem = {
-        ...data,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-      };
-      
-      // Add to collection
-      collection.push(newItem);
-      
-      // Save to localStorage
-      localStorage.setItem(key, JSON.stringify(collection));
-      
-      return newItem;
-    } else {
-      // For singleton endpoints, just save the data
-      localStorage.setItem(key, JSON.stringify(data));
-      return data;
+    // Debug logging
+    if (ENABLE_DEBUG_LOGGING) {
+      console.debug(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     }
-  } catch (error) {
-    console.error(`POST request failed for ${endpoint}:`, error);
-    throw error;
+    
+    return config;
+  },
+  (error) => {
+    console.error("API Request Error:", error);
+    return Promise.reject(error);
   }
-};
+);
 
-/**
- * Make a PUT request
- * @param {string} endpoint - API endpoint
- * @param {object} data - Request data
- * @returns {Promise} - Promise with response data
- */
-export const put = async (endpoint, data) => {
-  try {
-    // For now, simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Update data in localStorage based on endpoint
-    const key = getLocalStorageKey(endpoint);
-    
-    // For collection endpoints with ID, update the specific item
-    if (isCollectionEndpoint(endpoint) && endpoint.includes('/')) {
-      const collectionKey = getLocalStorageKey(endpoint.split('/')[0]);
-      const existingData = localStorage.getItem(collectionKey);
-      
-      if (existingData) {
-        const collection = JSON.parse(existingData);
-        const id = endpoint.split('/').pop();
-        
-        // Find and update the item
-        const updatedCollection = collection.map(item => {
-          if (item.id === id) {
-            return {
-              ...item,
-              ...data,
-              updatedAt: new Date().toISOString(),
-            };
-          }
-          return item;
-        });
-        
-        // Save to localStorage
-        localStorage.setItem(collectionKey, JSON.stringify(updatedCollection));
-        
-        // Return the updated item
-        return updatedCollection.find(item => item.id === id);
+// Add response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => {
+    // Debug logging
+    if (ENABLE_DEBUG_LOGGING) {
+      console.debug(`API Response: ${response.status} ${response.config.url}`);
+    }
+    return response;  
+  },
+  (error) => {
+    if (error.response) {
+      // The request was made and the server responded with a status code that falls out of the range of 2xx
+      if (ENABLE_DEBUG_LOGGING) {
+        console.error(
+          `API Error ${error.response.status}: ${error.response.data?.message || JSON.stringify(error.response.data)}`
+        );
       }
-      
-      throw new Error(`Item with ID ${endpoint.split('/').pop()} not found`);
-    } else {
-      // For singleton endpoints, just update the data
-      localStorage.setItem(key, JSON.stringify({
-        ...data,
-        updatedAt: new Date().toISOString(),
-      }));
-      
-      return data;
-    }
-  } catch (error) {
-    console.error(`PUT request failed for ${endpoint}:`, error);
-    throw error;
-  }
-};
 
-/**
- * Make a DELETE request
- * @param {string} endpoint - API endpoint
- * @returns {Promise} - Promise with success status
- */
-export const del = async (endpoint) => {
-  try {
-    // For now, simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Delete data from localStorage based on endpoint
-    if (isCollectionEndpoint(endpoint) && endpoint.includes('/')) {
-      const collectionKey = getLocalStorageKey(endpoint.split('/')[0]);
-      const existingData = localStorage.getItem(collectionKey);
-      
-      if (existingData) {
-        const collection = JSON.parse(existingData);
-        const id = endpoint.split('/').pop();
+      // Handle 401 Unauthorized errors (token expired or invalid)
+      if (error.response.status === 401) {
+        // Clear auth data from localStorage
+        localStorage.removeItem(USER_KEY);
         
-        // Filter out the item to delete
-        const updatedCollection = collection.filter(item => item.id !== id);
+        // Only redirect to login if not already on login page and not a background API check
+        const isLoginPage = window.location.pathname.includes('/login');
+        const isAuthEndpoint = error.config.url.includes('/auth/me');
         
-        // Save to localStorage
-        localStorage.setItem(collectionKey, JSON.stringify(updatedCollection));
-        
-        return { success: true };
+        if (!isLoginPage && !isAuthEndpoint) {
+          console.log('Redirecting to login due to 401 error');
+          window.location.href = '/login';
+        }
       }
-      
-      throw new Error(`Item with ID ${endpoint.split('/').pop()} not found`);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error("API No Response:", error.request);
     } else {
-      // For singleton endpoints, remove the item
-      const key = getLocalStorageKey(endpoint);
-      localStorage.removeItem(key);
-      
-      return { success: true };
+      // Something happened in setting up the request that triggered an Error
+      console.error("API Error:", error.message);
     }
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * Wrapper for API calls to handle common error scenarios
+ * @param {Function} apiCall - The API call function to execute
+ * @param {any} defaultValue - Default value to return on error
+ * @returns {Promise<any>} - Response data or default value
+ */
+export const safeApiCall = async (apiCall, defaultValue = null) => {
+  try {
+    const result = await apiCall();
+    return result;
   } catch (error) {
-    console.error(`DELETE request failed for ${endpoint}:`, error);
-    throw error;
+    console.error("API call failed:", error);
+    return defaultValue;
   }
 };
 
-/**
- * Helper function to get localStorage key from endpoint
- * @param {string} endpoint - API endpoint
- * @returns {string} - localStorage key
- */
-const getLocalStorageKey = (endpoint) => {
-  // Remove leading slash if present
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-  
-  // For endpoints with ID, use the collection name
-  if (cleanEndpoint.includes('/')) {
-    return cleanEndpoint.split('/')[0];
-  }
-  
-  return cleanEndpoint;
-};
-
-/**
- * Helper function to check if an endpoint is for a collection
- * @param {string} endpoint - API endpoint
- * @returns {boolean} - Whether the endpoint is for a collection
- */
-const isCollectionEndpoint = (endpoint) => {
-  const collectionsMap = {
-    'financial-sources': true,
-    'financial-source-updates': true,
-    'users': true,
-  };
-  
-  // Remove leading slash if present
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-  
-  // For endpoints with ID, check the collection name
-  if (cleanEndpoint.includes('/')) {
-    return collectionsMap[cleanEndpoint.split('/')[0]] || false;
-  }
-  
-  return collectionsMap[cleanEndpoint] || false;
+export default {
+  API_BASE_URL,
+  apiClient,
+  safeApiCall,
+  ENABLE_DEBUG_LOGGING,
+  get: (url, config) => apiClient.get(url, config),
+  post: (url, data, config) => apiClient.post(url, data, config),
+  put: (url, data, config) => apiClient.put(url, data, config),
+  patch: (url, data, config) => apiClient.patch(url, data, config),
+  delete: (url, config) => apiClient.delete(url, config)
 };

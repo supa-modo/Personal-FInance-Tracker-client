@@ -27,26 +27,35 @@ const Dashboard = () => {
     financialSources, 
     loading, 
     error, 
+    netWorth,
+    historicalData,
     getNetWorth,
     getHistoricalNetWorth
   } = useFinancial();
   
-  const [netWorth, setNetWorth] = useState(0);
-  const [historicalData, setHistoricalData] = useState([]);
   const [timePeriod, setTimePeriod] = useState('month');
   const [activeTab, setActiveTab] = useState('overview');
   
+  // Load dashboard data only once when component mounts or when timePeriod changes
   useEffect(() => {
-    if (!loading) {
-      // Calculate net worth
-      const worth = getNetWorth();
-      setNetWorth(worth);
-      
-      // Get historical data
-      const history = getHistoricalNetWorth(timePeriod);
-      setHistoricalData(history);
-    }
-  }, [loading, financialSources, timePeriod, getNetWorth, getHistoricalNetWorth]);
+    const loadData = async () => {
+      if (!loading) {
+        try {
+          // Load net worth data (now async)
+          await getNetWorth();
+          
+          // Load historical data (now async)
+          await getHistoricalNetWorth(timePeriod);
+        } catch (error) {
+          console.error('Error loading dashboard data:', error);
+        }
+      }
+    };
+    
+    loadData();
+    // Only depend on loading and timePeriod to prevent infinite loops
+    // getNetWorth and getHistoricalNetWorth are function references that shouldn't change
+  }, [loading, timePeriod]);
   
   // Get active financial sources
   const activeSources = financialSources.filter(source => source.isActive);
@@ -93,17 +102,20 @@ const Dashboard = () => {
   }));
   
   // Prepare data for line chart
-  const lineChartData = historicalData.map(item => ({
+  const lineChartData = Array.isArray(historicalData) ? historicalData.map(item => ({
     date: formatDate(item.date, { month: 'short', day: 'numeric' }),
-    total: item.total,
-  }));
+    total: item.netWorth || item.total || 0,
+  })) : [];
   
   // Calculate change from previous period
   const calculateChange = () => {
-    if (historicalData.length < 2) return { amount: 0, percentage: 0, isPositive: true };
+    if (!Array.isArray(historicalData) || historicalData.length < 2) {
+      return { amount: 0, percentage: 0, isPositive: true };
+    }
     
-    const currentTotal = historicalData[historicalData.length - 1]?.total || 0;
-    const previousTotal = historicalData[0]?.total || 0;
+    const currentTotal = historicalData[historicalData.length - 1]?.netWorth || 
+                        historicalData[historicalData.length - 1]?.total || 0;
+    const previousTotal = historicalData[0]?.netWorth || historicalData[0]?.total || 0;
     
     const change = currentTotal - previousTotal;
     const percentage = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;

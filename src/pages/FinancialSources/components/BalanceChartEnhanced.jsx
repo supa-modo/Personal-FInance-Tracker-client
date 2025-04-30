@@ -11,24 +11,19 @@ import {
 } from 'recharts';
 import { formatCurrency, formatDate } from '../../../utils/formatters';
 
-const BalanceChartEnhanced = ({ balanceData, sourceColor }) => {
-  const [chartData, setChartData] = useState([]);
+const BalanceChartEnhanced = ({ chartData, sourceColor }) => {
+  const [filteredData, setFilteredData] = useState([]);
   const [timeRange, setTimeRange] = useState('all');
   const [showAverage, setShowAverage] = useState(false);
   
   useEffect(() => {
-    if (!balanceData || balanceData.length === 0) {
-      setChartData([]);
+    if (!chartData || chartData.length === 0) {
+      setFilteredData([]);
       return;
     }
     
-    // Sort data by date
-    const sortedData = [...balanceData].sort((a, b) => 
-      new Date(a.date) - new Date(b.date)
-    );
-    
     // Filter data based on time range
-    let filteredData = sortedData;
+    let filtered = [...chartData];
     
     if (timeRange !== 'all') {
       const now = new Date();
@@ -51,24 +46,17 @@ const BalanceChartEnhanced = ({ balanceData, sourceColor }) => {
           break;
       }
       
-      filteredData = sortedData.filter(item => 
-        new Date(item.date) >= cutoffDate
+      filtered = chartData.filter(item => 
+        new Date(item.fullDate) >= cutoffDate
       );
     }
     
-    // Format data for chart
-    const formattedData = filteredData.map(item => ({
-      date: item.date,
-      balance: item.balance,
-      formattedDate: formatDate(item.date, { dateStyle: 'medium' })
-    }));
-    
-    setChartData(formattedData);
-  }, [balanceData, timeRange]);
+    setFilteredData(filtered);
+  }, [chartData, timeRange]);
   
   // Calculate average balance
-  const averageBalance = chartData.length > 0 
-    ? chartData.reduce((sum, item) => sum + item.balance, 0) / chartData.length 
+  const averageBalance = filteredData.length > 0 
+    ? filteredData.reduce((sum, item) => sum + item.balance, 0) / filteredData.length 
     : 0;
   
   // Custom tooltip
@@ -77,11 +65,16 @@ const BalanceChartEnhanced = ({ balanceData, sourceColor }) => {
       return (
         <div className="bg-slate-800 border border-slate-700 shadow-lg rounded-lg p-3">
           <p className="text-slate-300 text-sm mb-1">
-            {payload[0].payload.formattedDate}
+            {payload[0].payload.date}
           </p>
           <p className="text-white font-semibold">
             {formatCurrency(payload[0].value)}
           </p>
+          {payload[0].payload.notes && (
+            <p className="text-slate-400 text-xs mt-1">
+              {payload[0].payload.notes}
+            </p>
+          )}
         </div>
       );
     }
@@ -136,12 +129,12 @@ const BalanceChartEnhanced = ({ balanceData, sourceColor }) => {
         </div>
       </div>
       
-      <div className="p-6">
-        {chartData.length > 0 ? (
+      <div className="p-3 md:p-6">
+        {filteredData.length > 0 ? (
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={chartData}
+                data={filteredData}
                 margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -153,11 +146,13 @@ const BalanceChartEnhanced = ({ balanceData, sourceColor }) => {
                   }}
                   stroke="#94a3b8"
                   tick={{ fill: '#94a3b8' }}
+                  fontSize={13}
                 />
                 <YAxis 
                   tickFormatter={(value) => formatCurrency(value, { notation: 'compact' })}
                   stroke="#94a3b8"
                   tick={{ fill: '#94a3b8' }}
+                  fontSize={12}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line 

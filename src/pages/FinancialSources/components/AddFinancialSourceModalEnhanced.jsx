@@ -87,13 +87,21 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
     e.preventDefault();
     
     if (validateForm()) {
-      onAdd(formData);
+      // Ensure colorCode is set - use default blue if null
+      const dataToSubmit = {
+        ...formData,
+        colorCode: formData.colorCode || '#3B82F6' // Default to blue if not set
+      };
+      
+      // Pass the data to the parent component
+      onAdd(dataToSubmit);
+      
       // Reset form
       setFormData({
         name: '',
         type: 'BANK_ACCOUNT',
         description: '',
-        colorCode: '#4F46E5',
+        colorCode: '##3B82F6',
         isActive: true
       });
       setErrors({});
@@ -101,7 +109,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
   };
   
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 text-center ">

@@ -51,13 +51,13 @@ const SourceHeaderEnhanced = ({
             
             <div className="mt-4 md:mt-0 flex md:flex-col flex-row-reverse justify-between md:items-end">
               <div className="text-2xl md:text-3xl font-bold text-primary-500">
-                {/* {formatCurrency(latestBalance) } */} {formatCurrency(25300)}
+                {formatCurrency(latestBalance) }
               </div>
-              {/* {lastUpdated && ( */}
+              {lastUpdated && (
                 <div className="mt-1 text-sm text-slate-500">
-                  {/* Updated {getRelativeTimeString(lastUpdated)} */} Updated 2 days ago
+                  Updated {getRelativeTimeString(lastUpdated)}
                 </div>
-              {/* )} */}
+              )}
               {!source?.isActive && (
                 <span className="md:mt-2 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-red-900/50 text-red-300 border border-red-700/50">
                   Inactive

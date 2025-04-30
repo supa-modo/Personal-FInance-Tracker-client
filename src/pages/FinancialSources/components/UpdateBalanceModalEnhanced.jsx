@@ -10,7 +10,7 @@ import {
 } from 'react-icons/tb';
 import { formatCurrency } from '../../../utils/formatters';
 
-const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, currentBalance }) => {
+const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onSubmit, source, currentBalance }) => {
   const [formData, setFormData] = useState({
     balance: '',
     notes: '',
@@ -105,10 +105,10 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
     e.preventDefault();
     
     if (validateForm()) {
-      onUpdate({
+      onSubmit({
         balance: parseFloat(formData.balance),
         notes: formData.notes.trim(),
-        sourceId: source.id
+        sourceId: source?.id
       });
       
       // Reset form
@@ -117,6 +117,9 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onUpdate, source, current
         notes: '',
       });
       setErrors({});
+      
+      // Close the modal
+      onClose();
     }
   };
   

@@ -1,8 +1,10 @@
-import { get, post, put, del } from './api';
+import api, { API_BASE_URL } from "./api"
 
 /**
  * Financial service for handling financial data operations
  */
+
+
 
 /**
  * Get all financial sources
@@ -10,112 +12,35 @@ import { get, post, put, del } from './api';
  */
 export const getFinancialSources = async () => {
   try {
-    // Check if there are financial sources in localStorage
-    const storedSources = localStorage.getItem('financialSources');
+    const response = await api.get(`${API_BASE_URL}/financial-sources`);
     
-    if (storedSources) {
-      // Parse the stored sources
-      return JSON.parse(storedSources);
-    } else {
-      // If no sources in localStorage, use dummy data
-      const dummySources = [
-        {
-          id: '1',
-          name: 'Savings Account',
-          type: 'BANK_ACCOUNT',
-          description: 'Primary savings account',
-          colorCode: '#4CAF50',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updates: [
-            {
-              id: '1',
-              balance: 5000,
-              notes: 'Initial balance',
-              createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            },
-            {
-              id: '2',
-              balance: 5500,
-              notes: 'Salary deposit',
-              createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-            },
-            {
-              id: '3',
-              balance: 5200,
-              notes: 'Bill payment',
-              createdAt: new Date().toISOString(),
-            },
-          ],
-        },
-        {
-          id: '2',
-          name: 'Money Market Fund',
-          type: 'MONEY_MARKET',
-          description: 'High interest MMF',
-          colorCode: '#2196F3',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updates: [
-            {
-              id: '4',
-              balance: 10000,
-              notes: 'Initial investment',
-              createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-            },
-            {
-              id: '5',
-              balance: 10300,
-              notes: 'Interest earned',
-              createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            },
-            {
-              id: '6',
-              balance: 10600,
-              notes: 'Interest earned',
-              createdAt: new Date().toISOString(),
-            },
-          ],
-        },
-        {
-          id: '3',
-          name: 'Stock Portfolio',
-          type: 'STOCKS',
-          description: 'Tech stocks',
-          colorCode: '#FF5722',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updates: [
-            {
-              id: '7',
-              balance: 7500,
-              notes: 'Initial investment',
-              createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-            },
-            {
-              id: '8',
-              balance: 8200,
-              notes: 'Market gain',
-              createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-            },
-            {
-              id: '9',
-              balance: 7800,
-              notes: 'Market correction',
-              createdAt: new Date().toISOString(),
-            },
-          ],
-        },
-      ];
+    if (response.data && response.data.data && response.data.data.financialSources) {
+      // Transform backend data to match frontend format
+      const sources = response.data.data.financialSources.map(source => ({
+        id: source.id,
+        name: source.name,
+        type: source.type,
+        description: source.description,
+        colorCode: source.color_code,
+        isActive: source.is_active,
+        createdAt: source.created_at,
+        updatedAt: source.updated_at,
+        updates: source.updates ? source.updates.map(update => ({
+          id: update.id,
+          balance: parseFloat(update.balance),
+          notes: update.notes,
+          date: update.date,
+          createdAt: update.created_at
+        })) : []
+      }));
       
-      // Store the dummy sources in localStorage
-      localStorage.setItem('financialSources', JSON.stringify(dummySources));
-      
-      return dummySources;
+      return sources;
     }
+    
+    return [];
   } catch (error) {
-    console.error('Error getting financial sources:', error);
-    throw error;
+    console.error('Error getting financial sources:', error.response?.data?.message || error.message);
+    return [];
   }
 };
 
@@ -126,54 +51,77 @@ export const getFinancialSources = async () => {
  */
 export const getFinancialSourceById = async (id) => {
   try {
-    const sources = await getFinancialSources();
-    const source = sources.find(source => source.id === id);
+    const response = await api.get(`${API_BASE_URL}/financial-sources/${id}`);
     
-    if (!source) {
-      throw new Error(`Financial source with ID ${id} not found`);
+    if (response.data && response.data.data && response.data.data.financialSource) {
+      // Transform backend data to match frontend format
+      const source = response.data.data.financialSource;
+      return {
+        id: source.id,
+        name: source.name,
+        type: source.type,
+        description: source.description,
+        colorCode: source.color_code,
+        isActive: source.is_active,
+        createdAt: source.created_at,
+        updatedAt: source.updated_at,
+        updates: source.updates ? source.updates.map(update => ({
+          id: update.id,
+          balance: parseFloat(update.balance),
+          notes: update.notes,
+          date: update.date,
+          createdAt: update.created_at
+        })) : []
+      };
     }
     
-    return source;
+    throw new Error(`Financial source with ID ${id} not found`);
   } catch (error) {
-    console.error(`Error getting financial source with ID ${id}:`, error);
+    console.error(`Error getting financial source with ID ${id}:`, error.response?.data?.message || error.message);
     throw error;
   }
 };
 
 /**
  * Create a new financial source
- * @param {object} source - Financial source data
- * @returns {Promise} - Promise with created financial source data
+ * @param {Object} sourceData - Financial source data
+ * @returns {Promise} - Promise with created financial source
  */
-export const createFinancialSource = async (source) => {
+export const createFinancialSource = async (sourceData) => {
   try {
-    // Get existing sources
-    const sources = await getFinancialSources();
-    
-    // Create a new source with an ID and timestamps
-    const newSource = {
-      ...source,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updates: [
-        {
-          id: Date.now().toString() + '-update',
-          balance: source.initialBalance || 0,
-          notes: 'Initial balance',
-          createdAt: new Date().toISOString(),
-        },
-      ],
+    // Transform frontend data to match backend format
+    const backendSourceData = {
+      name: sourceData.name,
+      type: sourceData.type,
+      description: sourceData.description,
+      color_code: sourceData.colorCode || '#3B82F6', // Default to blue if not set
+      is_active: sourceData.isActive !== undefined ? sourceData.isActive : true
     };
     
-    // Add to sources
-    sources.push(newSource);
+    // Log the data being sent to the backend
+    console.log('Creating financial source with data:', backendSourceData);
     
-    // Update localStorage
-    localStorage.setItem('financialSources', JSON.stringify(sources));
+    const response = await api.post(`${API_BASE_URL}/financial-sources`, backendSourceData);
     
-    return newSource;
+    if (response.data && response.data.data && response.data.data.financialSource) {
+      // Transform backend response to match frontend format
+      const source = response.data.data.financialSource;
+      return {
+        id: source.id,
+        name: source.name,
+        type: source.type,
+        description: source.description,
+        colorCode: source.color_code,
+        isActive: source.is_active,
+        createdAt: source.created_at,
+        updatedAt: source.updated_at,
+        updates: []
+      };
+    }
+    
+    throw new Error('Failed to create financial source');
   } catch (error) {
-    console.error('Error creating financial source:', error);
+    console.error('Error creating financial source:', error.response?.data?.message || error.message);
     throw error;
   }
 };
@@ -186,29 +134,42 @@ export const createFinancialSource = async (source) => {
  */
 export const updateFinancialSource = async (id, updates) => {
   try {
-    // Get existing sources
-    const sources = await getFinancialSources();
+    // Transform frontend data to match backend format
+    const backendSourceData = {};
     
-    // Find the source to update
-    const sourceIndex = sources.findIndex(source => source.id === id);
+    if (updates.name) backendSourceData.name = updates.name;
+    if (updates.type) backendSourceData.type = updates.type;
+    if (updates.description) backendSourceData.description = updates.description;
+    if (updates.colorCode) backendSourceData.color_code = updates.colorCode;
+    if (updates.isActive !== undefined) backendSourceData.is_active = updates.isActive;
     
-    if (sourceIndex === -1) {
-      throw new Error(`Financial source with ID ${id} not found`);
+    const response = await api.patch(`${API_BASE_URL}/financial-sources/${id}`, backendSourceData);
+    
+    if (response.data && response.data.data && response.data.data.financialSource) {
+      // Transform backend response to match frontend format
+      const source = response.data.data.financialSource;
+      return {
+        id: source.id,
+        name: source.name,
+        type: source.type,
+        description: source.description,
+        colorCode: source.color_code,
+        isActive: source.is_active,
+        createdAt: source.created_at,
+        updatedAt: source.updated_at,
+        updates: source.updates ? source.updates.map(update => ({
+          id: update.id,
+          balance: parseFloat(update.balance),
+          notes: update.notes,
+          date: update.date,
+          createdAt: update.created_at
+        })) : []
+      };
     }
     
-    // Update the source
-    sources[sourceIndex] = {
-      ...sources[sourceIndex],
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // Update localStorage
-    localStorage.setItem('financialSources', JSON.stringify(sources));
-    
-    return sources[sourceIndex];
+    throw new Error(`Failed to update financial source with ID ${id}`);
   } catch (error) {
-    console.error(`Error updating financial source with ID ${id}:`, error);
+    console.error(`Error updating financial source with ID ${id}:`, error.response?.data?.message || error.message);
     throw error;
   }
 };
@@ -220,18 +181,10 @@ export const updateFinancialSource = async (id, updates) => {
  */
 export const deleteFinancialSource = async (id) => {
   try {
-    // Get existing sources
-    const sources = await getFinancialSources();
-    
-    // Filter out the source to delete
-    const updatedSources = sources.filter(source => source.id !== id);
-    
-    // Update localStorage
-    localStorage.setItem('financialSources', JSON.stringify(updatedSources));
-    
+    await api.delete(`${API_BASE_URL}/financial-sources/${id}`);
     return { success: true };
   } catch (error) {
-    console.error(`Error deleting financial source with ID ${id}:`, error);
+    console.error(`Error deleting financial source with ID ${id}:`, error.response?.data?.message || error.message);
     throw error;
   }
 };
@@ -244,35 +197,70 @@ export const deleteFinancialSource = async (id) => {
  */
 export const addBalanceUpdate = async (sourceId, update) => {
   try {
-    // Get existing sources
-    const sources = await getFinancialSources();
-    
-    // Find the source to update
-    const sourceIndex = sources.findIndex(source => source.id === sourceId);
-    
-    if (sourceIndex === -1) {
-      throw new Error(`Financial source with ID ${sourceId} not found`);
-    }
-    
-    // Create a new update with an ID and timestamp
-    const newUpdate = {
-      ...update,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
+    // Transform frontend data to match backend format
+    // Format date as YYYY-MM-DD as required by the backend
+    const formatDateToYYYYMMDD = (date) => {
+      const d = new Date(date);
+      return d.getFullYear() + '-' + 
+             String(d.getMonth() + 1).padStart(2, '0') + '-' + 
+             String(d.getDate()).padStart(2, '0');
     };
     
-    // Add the update to the source's updates
-    sources[sourceIndex].updates = [
-      ...(sources[sourceIndex].updates || []),
-      newUpdate,
-    ];
+    // Ensure balance is a number (not a string) as required by the backend
+    // and date is in the correct YYYY-MM-DD format
+    const backendUpdateData = {
+      balance: Number(update.balance), // Convert to number explicitly
+      notes: update.notes || '',
+      date: update.date ? formatDateToYYYYMMDD(update.date) : formatDateToYYYYMMDD(new Date())
+    };
     
-    // Update localStorage
-    localStorage.setItem('financialSources', JSON.stringify(sources));
+    // Log the data being sent to the backend
+    console.log('Adding balance update with data:', backendUpdateData);
     
-    return sources[sourceIndex];
+    try {
+      const response = await api.post(
+        `${API_BASE_URL}/financial-sources/${sourceId}/updates`, 
+        backendUpdateData
+      );
+      
+      // Check if we have a valid response with the update data
+      if (response.data && response.data.data && response.data.data.update) {
+        // Get the updated financial source
+        const updatedSource = await api.get(`${API_BASE_URL}/financial-sources/${sourceId}`);
+        
+        if (updatedSource.data && updatedSource.data.data && updatedSource.data.data.financialSource) {
+          // Transform backend response to match frontend format
+          const source = updatedSource.data.data.financialSource;
+          return {
+            id: source.id,
+            name: source.name,
+            type: source.type,
+            description: source.description,
+            colorCode: source.color_code,
+            isActive: source.is_active,
+            createdAt: source.created_at,
+            updatedAt: source.updated_at,
+            updates: source.updates ? source.updates.map(update => ({
+              id: update.id,
+              balance: parseFloat(update.balance),
+              notes: update.notes,
+              date: update.date,
+              createdAt: update.created_at
+            })) : []
+          };
+        }
+      }
+      
+      // If we got here, the update was created but we couldn't get the updated source
+      console.log('Balance update created successfully, but could not retrieve updated source');
+      return true;
+    } catch (apiError) {
+      console.error(`API error adding balance update to source with ID ${sourceId}:`, 
+                   apiError.response?.data?.message || apiError.message);
+      throw new Error(apiError.response?.data?.message || `Failed to add balance update to source with ID ${sourceId}`);
+    }
   } catch (error) {
-    console.error(`Error adding balance update to source with ID ${sourceId}:`, error);
+    console.error(`Error adding balance update to source with ID ${sourceId}:`, error.message);
     throw error;
   }
 };
@@ -284,10 +272,22 @@ export const addBalanceUpdate = async (sourceId, update) => {
  */
 export const getBalanceUpdates = async (sourceId) => {
   try {
-    const source = await getFinancialSourceById(sourceId);
-    return source.updates || [];
+    const response = await api.get(`${API_BASE_URL}/financial-sources/${sourceId}/updates`);
+    
+    if (response.data && response.data.data && response.data.data.updates) {
+      // Transform backend data to match frontend format
+      return response.data.data.updates.map(update => ({
+        id: update.id,
+        balance: parseFloat(update.balance),
+        notes: update.notes,
+        date: update.date,
+        createdAt: update.created_at
+      }));
+    }
+    
+    return [];
   } catch (error) {
-    console.error(`Error getting balance updates for source with ID ${sourceId}:`, error);
+    console.error(`Error getting balance updates for source with ID ${sourceId}:`, error.response?.data?.message || error.message);
     throw error;
   }
 };
@@ -298,6 +298,17 @@ export const getBalanceUpdates = async (sourceId) => {
  */
 export const getNetWorth = async () => {
   try {
+    // Try to get net worth from backend API
+    try {
+      const response = await api.get(`${API_BASE_URL}/financial-sources/net-worth`);
+      if (response.data && response.data.data && response.data.data.netWorth !== undefined) {
+        return parseFloat(response.data.data.netWorth);
+      }
+    } catch (apiError) {
+      console.warn('Could not get net worth from API, calculating locally:', apiError.message);
+    }
+    
+    // Fallback to local calculation if API fails
     const sources = await getFinancialSources();
     
     // Calculate the net worth based on the latest balance update for each source
@@ -317,7 +328,7 @@ export const getNetWorth = async () => {
     
     return netWorth;
   } catch (error) {
-    console.error('Error calculating net worth:', error);
+    console.error('Error calculating net worth:', error.response?.data?.message || error.message);
     throw error;
   }
 };
@@ -329,82 +340,133 @@ export const getNetWorth = async () => {
  */
 export const getHistoricalNetWorth = async (period = 'month') => {
   try {
-    const sources = await getFinancialSources();
+    // Try to get historical net worth from backend API
+    let useLocalCalculation = false;
+    let apiData = [];
     
-    // Determine the start date based on the period
-    const now = new Date();
-    let startDate;
-    
-    switch (period) {
-      case 'week':
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-        break;
-      case 'month':
-        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-        break;
-      case 'quarter':
-        startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-        break;
-      case 'year':
-        startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        break;
-      default:
-        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-    }
-    
-    // Get all updates from all active sources
-    const allUpdates = sources
-      .filter(source => source.isActive)
-      .flatMap(source => (source.updates || []).map(update => ({
-        ...update,
-        sourceId: source.id,
-        sourceName: source.name,
-        sourceType: source.type,
-        sourceColorCode: source.colorCode,
-      })))
-      .filter(update => new Date(update.createdAt) >= startDate)
-      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    
-    // Group updates by date
-    const dateMap = new Map();
-    
-    allUpdates.forEach(update => {
-      const date = new Date(update.createdAt).toISOString().split('T')[0];
-      
-      if (!dateMap.has(date)) {
-        dateMap.set(date, {
-          date,
-          sources: new Map(),
-        });
+    try {
+      const response = await api.get(`${API_BASE_URL}/financial-sources/historical-net-worth?period=${period}`);
+      if (response.data && response.data.data && response.data.data.historicalData) {
+        // Ensure we're returning an array of properly formatted items
+        const historicalData = response.data.data.historicalData;
+        
+        // Check if historicalData is an array
+        if (Array.isArray(historicalData) && historicalData.length > 0) {
+          apiData = historicalData.map(item => ({
+            date: item.date,
+            netWorth: parseFloat(item.netWorth || 0),
+            total: parseFloat(item.netWorth || 0), // Add total property for backward compatibility
+            sources: item.sources ? Object.fromEntries(
+              Object.entries(item.sources).map(([id, source]) => [
+                id,
+                {
+                  id: source.id,
+                  name: source.name,
+                  type: source.type,
+                  colorCode: source.color_code,
+                  balance: parseFloat(source.balance || 0)
+                }
+              ])
+            ) : {}
+          }));
+          
+          // If we got valid data from the API, return it
+          if (apiData.length > 0) {
+            return apiData;
+          }
+        }
       }
       
-      const dateData = dateMap.get(date);
-      dateData.sources.set(update.sourceId, {
-        id: update.sourceId,
-        name: update.sourceName,
-        type: update.sourceType,
-        colorCode: update.sourceColorCode,
-        balance: parseFloat(update.balance),
-      });
-    });
+      // If we get here, the API response didn't have valid data
+      useLocalCalculation = true;
+    } catch (apiError) {
+      console.warn('Could not get historical net worth from API, calculating locally:', apiError.message);
+      useLocalCalculation = true;
+    }
     
-    // Convert the map to an array and calculate the total for each date
-    const historicalData = Array.from(dateMap.values()).map(dateData => {
-      const total = Array.from(dateData.sources.values()).reduce(
-        (sum, source) => sum + source.balance,
-        0
-      );
+    // If API call failed or returned invalid data, use local calculation
+    if (useLocalCalculation) {
+      // Fallback to local calculation if API fails
+      const sources = await getFinancialSources();
+    
+      // Determine the start date based on the period
+      const now = new Date();
+      let startDate;
       
-      return {
-        date: dateData.date,
-        total,
-        sources: Array.from(dateData.sources.values()),
-      };
-    });
+      switch (period) {
+        case 'week':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+          break;
+        case 'month':
+          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          break;
+        case 'quarter':
+          startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+          break;
+        case 'year':
+          startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+          break;
+        default:
+          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      }
+      
+      // Get all updates from all active sources
+      const allUpdates = sources
+        .filter(source => source.isActive)
+        .flatMap(source => (source.updates || []).map(update => ({
+          ...update,
+          sourceId: source.id,
+          sourceName: source.name,
+          sourceType: source.type,
+          sourceColorCode: source.colorCode,
+        })))
+        .filter(update => new Date(update.createdAt) >= startDate)
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      
+      // Group updates by date
+      const dateMap = new Map();
+      
+      allUpdates.forEach(update => {
+        const date = new Date(update.createdAt).toISOString().split('T')[0];
+        
+        if (!dateMap.has(date)) {
+          dateMap.set(date, {
+            date,
+            netWorth: 0,
+            sources: {},
+          });
+        }
+        
+        const dateData = dateMap.get(date);
+        
+        // Update the source balance for this date
+        dateData.sources[update.sourceId] = {
+          id: update.sourceId,
+          name: update.sourceName,
+          type: update.sourceType,
+          colorCode: update.sourceColorCode,
+          balance: update.balance
+        };
+      });
+      
+      // Calculate net worth for each date based on the latest balance for each source
+      const historicalData = Array.from(dateMap.values()).map(dateData => {
+        // Calculate net worth for this date
+        dateData.netWorth = Object.values(dateData.sources).reduce(
+          (total, source) => total + source.balance,
+          0
+        );
+        
+        return dateData;
+      });
+      
+      return historicalData;
+    } // Close the if(useLocalCalculation) block
     
-    return historicalData;
+    // If we got here without returning, return an empty array as fallback
+    return [];
   } catch (error) {
-    console.error('Error calculating historical net worth:', error);
+    console.error(`Error getting historical net worth data for period ${period}:`, error.response?.data?.message || error.message);
     throw error;
   }
 };

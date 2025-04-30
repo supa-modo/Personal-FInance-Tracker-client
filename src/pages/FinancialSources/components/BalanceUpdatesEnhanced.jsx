@@ -11,7 +11,8 @@ import {
 } from 'react-icons/tb';
 import { formatCurrency, formatDate } from '../../../utils/formatters';
 
-const BalanceUpdatesEnhanced = ({ updates = [] }) => {
+const BalanceUpdatesEnhanced = ({ source }) => {
+  const updates = source?.updates || [];
   const [sortOrder, setSortOrder] = useState('desc');
   const [expandedUpdates, setExpandedUpdates] = useState({});
   const [showFilters, setShowFilters] = useState(false);
@@ -25,15 +26,40 @@ const BalanceUpdatesEnhanced = ({ updates = [] }) => {
     }));
   };
   
-  // Sort updates by date
+  // Sort updates by date (using createdAt which is more reliable)
   const sortedUpdates = [...updates].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
     return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
   });
   
+  // Calculate change amounts and filter updates by type
+  const updatesWithChanges = sortedUpdates.map((update, index, arr) => {
+    // For the first update (oldest if asc, newest if desc), we don't have a previous update to compare
+    // So we'll just use 0 as the change amount
+    let changeAmount = 0;
+    
+    if (index < arr.length - 1) {
+      const nextIndex = sortOrder === 'desc' ? index + 1 : arr.length - 1 - index;
+      const prevIndex = sortOrder === 'desc' ? index + 1 : arr.length - 1 - index;
+      
+      if (prevIndex >= 0 && prevIndex < arr.length) {
+        changeAmount = parseFloat(update.balance) - parseFloat(arr[prevIndex].balance);
+      }
+    } else if (arr.length > 1) {
+      // For the last update in the array
+      const prevIndex = sortOrder === 'desc' ? 1 : arr.length - 2;
+      changeAmount = parseFloat(update.balance) - parseFloat(arr[prevIndex].balance);
+    }
+    
+    return {
+      ...update,
+      changeAmount
+    };
+  });
+  
   // Filter updates by type (increase/decrease)
-  const filteredUpdates = sortedUpdates.filter(update => {
+  const filteredUpdates = updatesWithChanges.filter(update => {
     if (filterType === 'all') return true;
     if (filterType === 'increase' && update.changeAmount > 0) return true;
     if (filterType === 'decrease' && update.changeAmount < 0) return true;
@@ -153,7 +179,7 @@ const BalanceUpdatesEnhanced = ({ updates = [] }) => {
                       
                       <div className="ml-4">
                         <div className="text-sm font-medium text-white">
-                          {formatDate(update.date, { dateStyle: 'medium' })}
+                          {formatDate(new Date(update.createdAt), { dateStyle: 'medium' })}
                         </div>
                         <div className="text-sm text-slate-400">
                           Balance: {formatCurrency(update.balance)}

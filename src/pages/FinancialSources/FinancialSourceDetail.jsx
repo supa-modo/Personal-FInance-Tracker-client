@@ -12,6 +12,7 @@ import DeleteModalEnhanced from './components/DeleteModalEnhanced';
 import UpdateBalanceModalEnhanced from './components/UpdateBalanceModalEnhanced';
 import EditFinancialSourceModalEnhanced from './components/EditFinancialSourceModalEnhanced';
 import { TbAlertCircle, TbRefresh, TbArrowLeft } from 'react-icons/tb';
+import { formatDate } from '../../utils/formatters';
 
 const FinancialSourceDetail = () => {
   const { id } = useParams();
@@ -101,28 +102,19 @@ const FinancialSourceDetail = () => {
     }
   };
   
-  // Handle form submission
-  const handleUpdateSubmit = (e) => {
-    e.preventDefault();
+  // Handle form submission - now receives data from the modal component
+  const handleUpdateSubmit = (formData) => {
+    // Format today's date in YYYY-MM-DD format
+    const today = new Date();
+    const formattedDate = today.getFullYear() + '-' + 
+                         String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                         String(today.getDate()).padStart(2, '0');
     
-    // Validate form
-    const errors = {};
-    if (!updateForm.balance) {
-      errors.balance = 'Balance is required';
-    } else if (isNaN(updateForm.balance)) {
-      errors.balance = 'Balance must be a number';
-    }
-    
-    if (Object.keys(errors).length > 0) {
-      setUpdateErrors(errors);
-      return;
-    }
-    
-    // Add balance update
+    // Add balance update using the data from the modal
     addBalanceUpdate(source.id, {
-      balance: parseFloat(updateForm.balance),
-      notes: updateForm.notes,
-      createdAt: new Date().toISOString(),
+      balance: parseFloat(formData.balance),
+      notes: formData.notes,
+      date: formattedDate // Use the formatted date in YYYY-MM-DD format
     });
     
     // Close modal and reset form
@@ -147,16 +139,40 @@ const FinancialSourceDetail = () => {
   if (error) {
     return (
       <MainLayout>
-        <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-6 rounded-lg shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <TbAlertCircle className="h-6 w-6 text-red-500" />
-            </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-red-800">Error Loading Financial Source</h3>
+        <div className="bg-red-50 border-l-4 border-red-500 mx-2.5 md:mx-0 p-6 mb-6 rounded-lg shadow-sm">
+        <div className="flex items-center">
+            
+            <div className="ml-2 text-center md:text-start ">
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <TbAlertCircle className="h-6 w-6 text-red-500" />
+                <h3 className="text-base md:text-lg font-medium text-red-800">Error Loading Financial Source</h3>
+              </div>
               <p className="mt-1 text-sm text-red-700">
                 {error}
               </p>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+  
+  if (!source) {
+    return (
+      <MainLayout>
+        <div className="bg-red-50 border-l-4 border-red-500 mx-2.5 md:mx-0 p-6 mb-6 rounded-lg shadow-sm">
+          <div className="flex items-center">
+            
+            <div className="ml-2 text-center md:text-start">
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <TbAlertCircle className="h-6 w-6 text-red-500" />
+                <div>
+                  <h3 className="text-base md:text-lg font-medium text-red-800">Error Loading Financial Source</h3>
+                  <p className="mt-1 text-sm text-red-700">
+                    {error}
+                  </p>
+                </div>
+              </div>
               <button 
                 className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 onClick={() => window.location.reload()}
@@ -174,13 +190,14 @@ const FinancialSourceDetail = () => {
   if (!source) {
     return (
       <MainLayout>
-        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-6 rounded-lg shadow-sm">
+        <div className="bg-yellow-50 border-l-4 border-yellow-500 mx-2.5 md:mx-0 p-3.5 md:p-6 mb-6 rounded-lg shadow-sm">
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <TbAlertCircle className="h-6 w-6 text-yellow-500" />
-            </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-yellow-800">Financial Source Not Found</h3>
+            
+            <div className="ml-2 text-center md:text-start ">
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <TbAlertCircle className="h-6 w-6 text-yellow-500" />
+                <h3 className="text-base md:text-lg font-medium text-yellow-800">Financial Source Not Found</h3>
+              </div>
               <p className="mt-1 text-sm text-yellow-700">
                 The financial source you are looking for does not exist or has been deleted.
               </p>
@@ -206,12 +223,14 @@ const FinancialSourceDetail = () => {
       return [];
     }
     
-    // Sort updates by date
+    // Sort updates by date (using createdAt which is more reliable)
     return [...source.updates]
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
       .map(update => ({
-        date: update.date,
-        balance: update.balance
+        date: formatDate(new Date(update.createdAt), { month: 'short', day: 'numeric' }),
+        balance: parseFloat(update.balance),
+        fullDate: update.createdAt,
+        notes: update.notes
       }));
   };
   
@@ -231,6 +250,21 @@ const FinancialSourceDetail = () => {
   
   const chartData = getChartData(source);
   
+  // Calculate the latest balance and last updated date
+  const getLatestBalanceAndDate = (source) => {
+    const updates = source.updates || [];
+    const latestUpdate = updates.length > 0 
+      ? updates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] 
+      : null;
+    
+    return {
+      latestBalance: latestUpdate ? parseFloat(latestUpdate.balance) : 0,
+      lastUpdated: latestUpdate ? new Date(latestUpdate.createdAt) : null
+    };
+  };
+  
+  const { latestBalance, lastUpdated } = getLatestBalanceAndDate(source);
+  
   return (
     <>
     <MainLayout>
@@ -238,6 +272,8 @@ const FinancialSourceDetail = () => {
       <SourceHeaderEnhanced 
         source={source} 
         id={id} 
+        latestBalance={latestBalance}
+        lastUpdated={lastUpdated}
         onUpdateBalanceClick={handleUpdateClick} 
         onDeleteClick={handleDeleteClick}
         onEditClick={handleEditClick}

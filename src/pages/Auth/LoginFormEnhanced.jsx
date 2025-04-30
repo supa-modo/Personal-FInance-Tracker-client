@@ -193,7 +193,7 @@ const LoginFormEnhanced = ({
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 pr-6 flex items-center text-white/60 hover:text-white transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -290,27 +290,7 @@ const LoginFormEnhanced = ({
             </button>
           </div>
 
-          {/* Success message */}
-          {/* {isAuthenticated && (
-            <div className="rounded-xl bg-green-500/10 backdrop-blur-sm p-4 border border-green-500/30 animate-pulse">
-              <p className="text-sm font-medium text-green-200 flex items-center">
-                <svg
-                  className="h-4 w-4 mr-2 text-green-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Successfully logged in!
-              </p>
-            </div>
-          )} */}
+         
 
           {/* Register link */}
           <div className="text-center pt-2">

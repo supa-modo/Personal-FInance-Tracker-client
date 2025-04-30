@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { 
-  TbPlus, 
-  TbPencil, 
-  TbTrash, 
-  TbEye, 
-  TbSearch,
-  TbFilter,
-  TbX,
-  TbCheck,
-  TbChevronRight,
   TbCurrencyDollar,
   TbWallet,
   TbCreditCard,
@@ -155,7 +145,7 @@ const FinancialSourcesList = () => {
   if (error) {
     return (
       <MainLayout>
-        <div className="bg-red-900/30 backdrop-blur-sm border border-red-700/50 text-red-300 px-6 py-5 rounded-xl relative mb-6 shadow-lg">
+        <div className="bg-red-900/30 backdrop-blur-sm border border-red-700/50 text-red-300 mx-3 md:mx-1 px-6 py-5 rounded-xl relative mb-6 shadow-lg">
           <div className="flex items-center">
             <TbAlertCircle className="h-6 w-6 mr-3" />
             <div>

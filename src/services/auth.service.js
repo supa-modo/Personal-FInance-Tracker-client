@@ -25,6 +25,8 @@ export const login = async (email, password) => {
     
     // Store user data in localStorage
     if (response.data && response.data.data && response.data.data.user) {
+      // The JWT token is stored in an HttpOnly cookie by the server
+      // We only need to store the user data
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
       return response.data.data.user;
     }

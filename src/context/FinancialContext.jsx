@@ -1,4 +1,14 @@
 import React, { createContext, useState, useEffect } from 'react';
+import {
+  getFinancialSources,
+  getFinancialSourceById,
+  createFinancialSource as apiCreateSource,
+  updateFinancialSource as apiUpdateSource,
+  deleteFinancialSource as apiDeleteSource,
+  addBalanceUpdate as apiAddBalanceUpdate,
+  getNetWorth as apiGetNetWorth,
+  getHistoricalNetWorth as apiGetHistoricalNetWorth
+} from '../services/financial.service';
 
 // Create the financial context
 export const FinancialContext = createContext();
@@ -12,152 +22,45 @@ export const FinancialProvider = ({ children }) => {
   // State for error
   const [error, setError] = useState(null);
 
-  // Effect to load financial sources from localStorage or API
+  // Effect to load financial sources from API
   useEffect(() => {
-    const loadFinancialSources = async () => {
-      try {
-        setLoading(true);
-        
-        // Check if there are financial sources in localStorage
-        const storedSources = localStorage.getItem('financialSources');
-        
-        if (storedSources) {
-          // Parse the stored sources
-          const parsedSources = JSON.parse(storedSources);
-          setFinancialSources(parsedSources);
-        } else {
-          // If no sources in localStorage, use dummy data
-          const dummySources = [
-            {
-              id: '1',
-              name: 'Savings Account',
-              type: 'BANK_ACCOUNT',
-              description: 'Primary savings account',
-              colorCode: '#4CAF50',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              updates: [
-                {
-                  id: '1',
-                  balance: 5000,
-                  notes: 'Initial balance',
-                  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-                },
-                {
-                  id: '2',
-                  balance: 5500,
-                  notes: 'Salary deposit',
-                  createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-                },
-                {
-                  id: '3',
-                  balance: 5200,
-                  notes: 'Bill payment',
-                  createdAt: new Date().toISOString(),
-                },
-              ],
-            },
-            {
-              id: '2',
-              name: 'Money Market Fund',
-              type: 'MONEY_MARKET',
-              description: 'High interest MMF',
-              colorCode: '#2196F3',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              updates: [
-                {
-                  id: '4',
-                  balance: 10000,
-                  notes: 'Initial investment',
-                  createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-                },
-                {
-                  id: '5',
-                  balance: 10300,
-                  notes: 'Interest earned',
-                  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-                },
-                {
-                  id: '6',
-                  balance: 10600,
-                  notes: 'Interest earned',
-                  createdAt: new Date().toISOString(),
-                },
-              ],
-            },
-            {
-              id: '3',
-              name: 'Stock Portfolio',
-              type: 'STOCKS',
-              description: 'Tech stocks',
-              colorCode: '#FF5722',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              updates: [
-                {
-                  id: '7',
-                  balance: 7500,
-                  notes: 'Initial investment',
-                  createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-                },
-                {
-                  id: '8',
-                  balance: 8200,
-                  notes: 'Market gain',
-                  createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-                },
-                {
-                  id: '9',
-                  balance: 7800,
-                  notes: 'Market correction',
-                  createdAt: new Date().toISOString(),
-                },
-              ],
-            },
-          ];
-          
-          // Store the dummy sources in localStorage
-          localStorage.setItem('financialSources', JSON.stringify(dummySources));
-          
-          // Update the state
-          setFinancialSources(dummySources);
-        }
-      } catch (error) {
-        console.error('Error loading financial sources:', error);
-        setError('Failed to load financial data');
-      } finally {
-        setLoading(false);
-      }
-    };
+    
 
     loadFinancialSources();
   }, []);
 
-  // Function to add a new financial source
-  const addFinancialSource = (source) => {
+  const loadFinancialSources = async () => {
     try {
-      // Create a new source with an ID and timestamps
-      const newSource = {
-        ...source,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updates: [
-          {
-            id: Date.now().toString() + '-update',
-            balance: source.initialBalance || 0,
-            notes: 'Initial balance',
-            createdAt: new Date().toISOString(),
-          },
-        ],
+      setLoading(true);
+      
+      const financialSources = await getFinancialSources();
+      setFinancialSources(financialSources);
+    } catch (error) {
+      console.error('Error loading financial sources:', error);
+      setError('Failed to load financial data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to add a new financial source
+  const addFinancialSource = async(source) => {
+    try {
+      // Prepare source data for API
+      const sourceData = {
+        name: source.name,
+        type: source.type,
+        description: source.description || '',
+        colorCode: source.colorCode || '#4CAF50',
+        initialBalance: source.initialBalance || 0,
+        notes: source.notes || 'Initial balance'
       };
+
+      // Create source through API
+      const newSource = await apiCreateSource(sourceData);
       
-      // Update the state
-      const updatedSources = [...financialSources, newSource];
-      setFinancialSources(updatedSources);
-      
-      // Update localStorage
-      localStorage.setItem('financialSources', JSON.stringify(updatedSources));
+      // Refresh sources from API
+      await loadFinancialSources();
       
       return newSource;
     } catch (error) {
@@ -168,23 +71,15 @@ export const FinancialProvider = ({ children }) => {
   };
 
   // Function to update a financial source
-  const updateFinancialSource = (id, updates) => {
+  const updateFinancialSource = async(id, updates) => {
     try {
-      // Find the source to update
-      const updatedSources = financialSources.map(source => {
-        if (source.id === id) {
-          return { ...source, ...updates };
-        }
-        return source;
-      });
+      // Update source through API
+      const updatedSource = await apiUpdateSource(id, updates);
       
-      // Update the state
-      setFinancialSources(updatedSources);
+      // Refresh sources from API
+      await loadFinancialSources();
       
-      // Update localStorage
-      localStorage.setItem('financialSources', JSON.stringify(updatedSources));
-      
-      return updatedSources.find(source => source.id === id);
+      return updatedSource;
     } catch (error) {
       console.error('Error updating financial source:', error);
       setError('Failed to update financial source');
@@ -193,16 +88,13 @@ export const FinancialProvider = ({ children }) => {
   };
 
   // Function to delete a financial source
-  const deleteFinancialSource = (id) => {
+  const deleteFinancialSource = async(id) => {
     try {
-      // Filter out the source to delete
-      const updatedSources = financialSources.filter(source => source.id !== id);
+      // Delete source through API
+      await apiDeleteSource(id);
       
-      // Update the state
-      setFinancialSources(updatedSources);
-      
-      // Update localStorage
-      localStorage.setItem('financialSources', JSON.stringify(updatedSources));
+      // Refresh sources from API
+      await loadFinancialSources();
       
       return true;
     } catch (error) {
@@ -213,34 +105,15 @@ export const FinancialProvider = ({ children }) => {
   };
 
   // Function to add a balance update to a financial source
-  const addBalanceUpdate = (sourceId, update) => {
+  const addBalanceUpdate = async (sourceId, update) => {
     try {
-      // Find the source to update
-      const updatedSources = financialSources.map(source => {
-        if (source.id === sourceId) {
-          // Create a new update with an ID and timestamp
-          const newUpdate = {
-            ...update,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-          };
-          
-          // Add the update to the source's updates
-          return {
-            ...source,
-            updates: [...(source.updates || []), newUpdate],
-          };
-        }
-        return source;
-      });
+      // Add balance update through API
+      const updatedSource = await apiAddBalanceUpdate(sourceId, update);
       
-      // Update the state
-      setFinancialSources(updatedSources);
+      // Refresh sources from API
+      await loadFinancialSources();
       
-      // Update localStorage
-      localStorage.setItem('financialSources', JSON.stringify(updatedSources));
-      
-      return updatedSources.find(source => source.id === sourceId);
+      return updatedSource;
     } catch (error) {
       console.error('Error adding balance update:', error);
       setError('Failed to add balance update');
@@ -249,22 +122,10 @@ export const FinancialProvider = ({ children }) => {
   };
 
   // Function to get the current net worth
-  const getNetWorth = () => {
+  const getNetWorth = async () => {
     try {
-      // Calculate the net worth based on the latest balance update for each source
-      return financialSources.reduce((total, source) => {
-        // Skip inactive sources
-        if (!source.isActive) return total;
-        
-        // Get the latest balance update
-        const updates = source.updates || [];
-        const latestUpdate = updates.length > 0 
-          ? updates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] 
-          : null;
-        
-        // Add the latest balance to the total
-        return total + (latestUpdate ? parseFloat(latestUpdate.balance) : 0);
-      }, 0);
+      // Get net worth through API
+      return await apiGetNetWorth();
     } catch (error) {
       console.error('Error calculating net worth:', error);
       return 0;
@@ -272,97 +133,94 @@ export const FinancialProvider = ({ children }) => {
   };
 
   // Function to get historical net worth data
-  const getHistoricalNetWorth = (period = 'month') => {
+  const getHistoricalNetWorth = async (period = 'month') => {
     try {
-      // Determine the start date based on the period
-      const now = new Date();
-      let startDate;
-      
-      switch (period) {
-        case 'week':
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-          break;
-        case 'month':
-          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-          break;
-        case 'quarter':
-          startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-          break;
-        case 'year':
-          startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-          break;
-        default:
-          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-      }
-      
-      // Get all updates from all active sources
-      const allUpdates = financialSources
-        .filter(source => source.isActive)
-        .flatMap(source => (source.updates || []).map(update => ({
-          ...update,
-          sourceId: source.id,
-          sourceName: source.name,
-          sourceType: source.type,
-          sourceColorCode: source.colorCode,
-        })))
-        .filter(update => new Date(update.createdAt) >= startDate)
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-      
-      // Group updates by date
-      const dateMap = new Map();
-      
-      allUpdates.forEach(update => {
-        const date = new Date(update.createdAt).toISOString().split('T')[0];
-        
-        if (!dateMap.has(date)) {
-          dateMap.set(date, {
-            date,
-            sources: new Map(),
-          });
-        }
-        
-        const dateData = dateMap.get(date);
-        dateData.sources.set(update.sourceId, {
-          id: update.sourceId,
-          name: update.sourceName,
-          type: update.sourceType,
-          colorCode: update.sourceColorCode,
-          balance: parseFloat(update.balance),
-        });
-      });
-      
-      // Convert the map to an array and calculate the total for each date
-      const historicalData = Array.from(dateMap.values()).map(dateData => {
-        const total = Array.from(dateData.sources.values()).reduce(
-          (sum, source) => sum + source.balance,
-          0
-        );
-        
-        return {
-          date: dateData.date,
-          total,
-          sources: Array.from(dateData.sources.values()),
-        };
-      });
-      
-      return historicalData;
+      // Get historical net worth data through API
+      return await apiGetHistoricalNetWorth(period);
     } catch (error) {
       console.error('Error calculating historical net worth:', error);
       return [];
     }
   };
 
+  // State for net worth
+  const [netWorth, setNetWorth] = useState(0);
+  const [historicalData, setHistoricalData] = useState([]);
+
+  // Load net worth data only when financial sources change
+  useEffect(() => {
+    // Only load net worth and historical data when financial sources are first loaded
+    // or when they change in a meaningful way (added/removed/updated)
+    if (financialSources.length > 0) {
+      // Use a ref to track if this is the initial load
+      const initialDataLoad = !netWorth && historicalData.length === 0;
+      
+      // Only load data if it's the initial load or if sources have changed
+      if (initialDataLoad) {
+        loadNetWorth();
+        loadHistoricalData('month');
+      }
+    }
+  }, [financialSources, netWorth, historicalData.length]);
+
+  // Load net worth with debouncing to prevent excessive API calls
+  const loadNetWorth = async () => {
+    try {
+      // Only fetch if we don't already have a value or if it's been explicitly requested
+      const worth = await apiGetNetWorth();
+      
+      // Only update state if the value has changed
+      if (worth !== netWorth) {
+        setNetWorth(worth);
+      }
+    } catch (error) {
+      console.error('Error loading net worth:', error);
+    }
+  };
+
+  // Load historical data with period tracking to prevent duplicate calls
+  const loadHistoricalData = async (period = 'month') => {
+    // Store the last requested period to avoid duplicate calls
+    const lastPeriod = loadHistoricalData.lastPeriod;
+    loadHistoricalData.lastPeriod = period;
+    
+    // Skip if we already have data for this period and it's not an explicit refresh
+    if (lastPeriod === period && historicalData.length > 0) {
+      return historicalData;
+    }
+    
+    try {
+      const data = await apiGetHistoricalNetWorth(period);
+      
+      // Only update state if we got new data
+      if (data && Array.isArray(data) && 
+          (historicalData.length !== data.length || JSON.stringify(data) !== JSON.stringify(historicalData))) {
+        setHistoricalData(data);
+      }
+      return data;
+    } catch (error) {
+      console.error('Error loading historical data:', error);
+      return historicalData;
+    }
+  };
+  
+  // Initialize the last period
+  loadHistoricalData.lastPeriod = null;
+
   // Create the context value
   const contextValue = {
     financialSources,
     loading,
     error,
+    netWorth,
+    historicalData,
     addFinancialSource,
     updateFinancialSource,
     deleteFinancialSource,
     addBalanceUpdate,
-    getNetWorth,
-    getHistoricalNetWorth,
+    getNetWorth: loadNetWorth,  // Replace with function that updates state
+    getHistoricalNetWorth: loadHistoricalData,  // Replace with function that updates state
+    refreshData: loadFinancialSources
   };
 
   // Return the provider
