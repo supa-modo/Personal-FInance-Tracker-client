@@ -21,6 +21,7 @@ import {
   TbWallet,
   TbCurrencyDollar
 } from 'react-icons/tb';
+import { PiMoneyWavyDuotone } from 'react-icons/pi';
 
 const Dashboard = () => {
   const { 
@@ -137,6 +138,7 @@ const Dashboard = () => {
       case 'STOCKS': return 'Stocks';
       case 'MPESA': return 'M-Pesa';
       case 'SACCO': return 'SACCO';
+      case 'CASH': return 'Cash Money';
       case 'OTHER': return 'Other';
       default: return type;
     }
@@ -150,6 +152,7 @@ const Dashboard = () => {
       case 'STOCKS': return <TbTrendingUp className="h-6 w-6 text-white" />;
       case 'MPESA': return <TbCreditCard className="h-6 w-6 text-white" />;
       case 'SACCO': return <TbWallet className="h-6 w-6 text-white" />;
+      case 'CASH': return <PiMoneyWavyDuotone className="h-6 w-6 text-white" />;
       case 'OTHER': return <TbCurrencyDollar className="h-6 w-6 text-white" />;
       default: return <TbCurrencyDollar className="h-6 w-6 text-white" />;
     }

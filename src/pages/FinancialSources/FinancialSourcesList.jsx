@@ -19,6 +19,7 @@ import AddFinancialSourceModalEnhanced from './components/AddFinancialSourceModa
 import DeleteModalEnhanced from './components/DeleteModalEnhanced';
 import EditFinancialSourceModalEnhanced from './components/EditFinancialSourceModalEnhanced';
 import SourcesHeader from './components/SourcesHeader';
+import { PiMoneyWavyDuotone } from 'react-icons/pi';
 
 const FinancialSourcesList = () => {
   const { financialSources, loading, error, deleteFinancialSource, addFinancialSource, updateFinancialSource } = useFinancial();
@@ -107,6 +108,8 @@ const FinancialSourcesList = () => {
         return 'M-Pesa';
       case 'SACCO':
         return 'SACCO';
+      case 'CASH':
+        return 'CASH';
       case 'OTHER':
         return 'Other';
       default:
@@ -122,6 +125,7 @@ const FinancialSourcesList = () => {
       case 'STOCKS': return <TbTrendingUp className="h-6 w-6 text-white" />;
       case 'MPESA': return <TbCreditCard className="h-6 w-6 text-white" />;
       case 'SACCO': return <TbWallet className="h-6 w-6 text-white" />;
+      case 'CASH': return <PiMoneyWavyDuotone className="h-6 w-6 text-white" />;
       case 'OTHER': return <TbCurrencyDollar className="h-6 w-6 text-white" />;
       default: return <TbCurrencyDollar className="h-6 w-6 text-white" />;
     }

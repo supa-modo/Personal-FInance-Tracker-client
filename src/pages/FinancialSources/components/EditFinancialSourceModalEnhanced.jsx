@@ -11,6 +11,7 @@ import {
   TbCurrencyDollar
 } from 'react-icons/tb';
 import { FaSave } from "react-icons/fa";
+import { PiMoneyWavyDuotone } from 'react-icons/pi';
 
 /**
  * EditFinancialSourceModalEnhanced is a modal component that allows users to edit
@@ -24,7 +25,7 @@ import { FaSave } from "react-icons/fa";
  * @param {function} onEdit - Callback to handle the form submission with updated data.
  * @param {object} source - The financial source data to be edited.
  */
-const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) => {
+const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onSubmit, source }) => {
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -56,6 +57,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
     { value: 'STOCKS', label: 'Stocks', icon: <TbTrendingUp className="h-5 w-5" /> },
     { value: 'MPESA', label: 'M-Pesa', icon: <TbCreditCard className="h-5 w-5" /> },
     { value: 'SACCO', label: 'SACCO', icon: <TbWallet className="h-5 w-5" /> },
+    {value: 'CASH', label:'Cash Money', icon: <PiMoneyWavyDuotone className="h-5 w-5" /> },
     { value: 'OTHER', label: 'Other', icon: <TbCurrencyDollar className="h-5 w-5" /> },
   ];
   
@@ -115,7 +117,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onEdit, source }) =
     e.preventDefault();
     
     if (validateForm()) {
-      onEdit(formData);
+      onSubmit(formData);
       setErrors({});
     }
   };

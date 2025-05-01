@@ -59,7 +59,7 @@ const SourceDetailsCardEnhanced = ({ source, getTypeLabel }) => {
             </dd>
           </div>
 
-          <div className="sm:col-span-2">
+          <div className="col-span-2">
             <dt className="text-sm font-medium text-slate-400">Description</dt>
             <dd className="mt-1 text-base text-white">
               {source?.description || 'No description provided'}
