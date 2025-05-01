@@ -7,15 +7,8 @@ import axios from 'axios';
 // API base URL
 const API_URL = 'http://localhost:5000/api/v1';
 
-// Configure axios to include credentials (cookies)
 axios.defaults.withCredentials = true;
 
-/**
- * Login a user
- * @param {string} email - User email
- * @param {string} password - User password
- * @returns {Promise} - Promise with user data
- */
 /**
  * Logs in a user with the specified email and password.
  * Sends a POST request to the authentication endpoint and
@@ -28,22 +21,35 @@ axios.defaults.withCredentials = true;
  */
 export const login = async (email, password) => {
   try {
+    // Validate input
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+
+    // Make the API call with credentials
     const response = await axios.post(`${API_URL}/auth/login`, {
       email,
       password
-    });
+    }, { withCredentials: true });
     
     // Store user data in localStorage
     if (response.data && response.data.data && response.data.data.user) {
       // The JWT token is stored in an HttpOnly cookie by the server
       // We only need to store the user data
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
+      
+      // Ensure axios is configured to send cookies with every request
+      axios.defaults.withCredentials = true;
+      
+      console.log('Login successful, user data stored in localStorage');
       return response.data.data.user;
     }
     
     throw new Error('Invalid response from server');
   } catch (error) {
     console.error('Login failed:', error.response?.data?.message || error.message);
+    // Clear any existing user data from localStorage on login error
+    localStorage.removeItem('user-personal-finance');
     throw new Error(error.response?.data?.message || 'Login failed. Please try again.');
   }
 };
@@ -107,7 +113,8 @@ export const logout = async () => {
  */
 export const fetchCurrentUser = async () => {
   try {
-    const response = await axios.get(`${API_URL}/auth/me`);
+    // Ensure we're sending cookies with the request
+    const response = await axios.get(`${API_URL}/auth/me`, { withCredentials: true });
     
     if (response.data && response.data.data && response.data.data.user) {
       // Update localStorage with latest user data
@@ -115,9 +122,16 @@ export const fetchCurrentUser = async () => {
       return response.data.data.user;
     }
     
+    // If we get here with a successful response but no user data,
+    // clear any existing user data from localStorage
+    localStorage.removeItem('user-personal-finance');
     return null;
   } catch (error) {
     console.error('Error fetching current user:', error.response?.data?.message || error.message);
+    // Clear any existing user data from localStorage on auth error
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('user-personal-finance');
+    }
     return null;
   }
 };
@@ -146,13 +160,25 @@ export const getCurrentUser = () => {
  */
 export const updatePassword = async (currentPassword, newPassword, newPasswordConfirm) => {
   try {
+    // Ensure we have all required parameters
+    if (!currentPassword || !newPassword || !newPasswordConfirm) {
+      throw new Error('All password fields are required');
+    }
+
+    // Ensure new password and confirmation match
+    if (newPassword !== newPasswordConfirm) {
+      throw new Error('New password and confirmation do not match');
+    }
+
+    // Make the API call with proper credentials
     const response = await axios.patch(`${API_URL}/auth/update-password`, {
       currentPassword,
       newPassword,
       newPasswordConfirm
-    });
+    }, { withCredentials: true });
     
     if (response.data && response.data.data && response.data.data.user) {
+      // Update the user in localStorage with the latest data
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
       return response.data.data.user;
     }

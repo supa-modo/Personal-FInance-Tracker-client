@@ -1,4 +1,4 @@
-import api, { API_BASE_URL } from "./api"
+import { API_BASE_URL, apiClient } from "./api"
 
 /**
  * Financial service for handling financial data operations
@@ -12,7 +12,7 @@ import api, { API_BASE_URL } from "./api"
  */
 export const getFinancialSources = async () => {
   try {
-    const response = await api.get(`${API_BASE_URL}/financial-sources`);
+    const response = await apiClient.get(`${API_BASE_URL}/financial-sources`);
     
     if (response.data && response.data.data && response.data.data.financialSources) {
       // Transform backend data to match frontend format
@@ -51,7 +51,7 @@ export const getFinancialSources = async () => {
  */
 export const getFinancialSourceById = async (id) => {
   try {
-    const response = await api.get(`${API_BASE_URL}/financial-sources/${id}`);
+    const response = await apiClient.get(`${API_BASE_URL}/financial-sources/${id}`);
     
     if (response.data && response.data.data && response.data.data.financialSource) {
       // Transform backend data to match frontend format
@@ -101,7 +101,7 @@ export const createFinancialSource = async (sourceData) => {
     // Log the data being sent to the backend
     console.log('Creating financial source with data:', backendSourceData);
     
-    const response = await api.post(`${API_BASE_URL}/financial-sources`, backendSourceData);
+    const response = await apiClient.post(`${API_BASE_URL}/financial-sources`, backendSourceData);
     
     if (response.data && response.data.data && response.data.data.financialSource) {
       // Transform backend response to match frontend format
@@ -143,7 +143,7 @@ export const updateFinancialSource = async (id, updates) => {
     if (updates.colorCode) backendSourceData.color_code = updates.colorCode;
     if (updates.isActive !== undefined) backendSourceData.is_active = updates.isActive;
     
-    const response = await api.patch(`${API_BASE_URL}/financial-sources/${id}`, backendSourceData);
+    const response = await apiClient.patch(`${API_BASE_URL}/financial-sources/${id}`, backendSourceData);
     
     if (response.data && response.data.data && response.data.data.financialSource) {
       // Transform backend response to match frontend format
@@ -181,7 +181,7 @@ export const updateFinancialSource = async (id, updates) => {
  */
 export const deleteFinancialSource = async (id) => {
   try {
-    await api.delete(`${API_BASE_URL}/financial-sources/${id}`);
+    await apiClient.delete(`${API_BASE_URL}/financial-sources/${id}`);
     return { success: true };
   } catch (error) {
     console.error(`Error deleting financial source with ID ${id}:`, error.response?.data?.message || error.message);
@@ -218,7 +218,7 @@ export const addBalanceUpdate = async (sourceId, update) => {
     console.log('Adding balance update with data:', backendUpdateData);
     
     try {
-      const response = await api.post(
+      const response = await apiClient.post(
         `${API_BASE_URL}/financial-sources/${sourceId}/updates`, 
         backendUpdateData
       );
@@ -226,7 +226,7 @@ export const addBalanceUpdate = async (sourceId, update) => {
       // Check if we have a valid response with the update data
       if (response.data && response.data.data && response.data.data.update) {
         // Get the updated financial source
-        const updatedSource = await api.get(`${API_BASE_URL}/financial-sources/${sourceId}`);
+        const updatedSource = await apiClient.get(`${API_BASE_URL}/financial-sources/${sourceId}`);
         
         if (updatedSource.data && updatedSource.data.data && updatedSource.data.data.financialSource) {
           // Transform backend response to match frontend format
@@ -272,7 +272,7 @@ export const addBalanceUpdate = async (sourceId, update) => {
  */
 export const getBalanceUpdates = async (sourceId) => {
   try {
-    const response = await api.get(`${API_BASE_URL}/financial-sources/${sourceId}/updates`);
+    const response = await apiClient.get(`${API_BASE_URL}/financial-sources/${sourceId}/updates`);
     
     if (response.data && response.data.data && response.data.data.updates) {
       // Transform backend data to match frontend format
@@ -300,7 +300,7 @@ export const getNetWorth = async () => {
   try {
     // Try to get net worth from backend API
     try {
-      const response = await api.get(`${API_BASE_URL}/financial-sources/net-worth`);
+      const response = await apiClient.get(`${API_BASE_URL}/financial-sources/net-worth`);
       if (response.data && response.data.data && response.data.data.netWorth !== undefined) {
         return parseFloat(response.data.data.netWorth);
       }
@@ -345,7 +345,7 @@ export const getHistoricalNetWorth = async (period = 'month') => {
     let apiData = [];
     
     try {
-      const response = await api.get(`${API_BASE_URL}/financial-sources/historical-net-worth?period=${period}`);
+      const response = await apiClient.get(`${API_BASE_URL}/financial-sources/historical-net-worth?period=${period}`);
       if (response.data && response.data.data && response.data.data.historicalData) {
         // Ensure we're returning an array of properly formatted items
         const historicalData = response.data.data.historicalData;

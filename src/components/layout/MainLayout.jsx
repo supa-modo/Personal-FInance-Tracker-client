@@ -83,9 +83,9 @@ const MainLayout = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-all duration-200 ${
+                  className={`inline-flex items-center px-1 py-2 mt-3 text-sm font-medium transition-all duration-200 ${
                     location.pathname === item.path
-                      ? 'text-primary-400 border-b-2 border-primary-500'
+                      ? 'text-primary-400 border-b-2 border-primary-500 '
                       : 'text-slate-400 hover:text-slate-200 hover:border-b-2 hover:border-slate-500'
                   }`}
                 >

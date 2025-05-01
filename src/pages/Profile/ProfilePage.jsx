@@ -1,69 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import useAuth from '../../hooks/useAuth';
+import { motion } from 'framer-motion';
 import MainLayout from '../../components/layout/MainLayout';
-import useAuth  from '../../hooks/useAuth';
-import {
-  TbX,
-  TbUser,
-  TbMail,
-  TbLock,
-  TbBell,
-  TbDeviceFloppy,
-  TbLoader2,
-  TbCheck,
-  TbAlertCircle,
-  TbShieldLock,
-  TbSettings,
-  TbUserCircle,
-  TbInfoCircle,
-} from 'react-icons/tb';
 
-// Notification Modal Component
-const NotificationModal = ({ type, message, isVisible, onClose }) => {
-  if (!isVisible) return null;
-  
-  // Define styles and icons based on notification type
-  let bgColor, iconColor, icon;
-  
-  switch (type) {
-    case 'success':
-      bgColor = 'bg-green-500/20';
-      iconColor = 'text-green-400';
-      icon = <TbCheck className="h-6 w-6" />;
-      break;
-    case 'error':
-      bgColor = 'bg-red-500/20';
-      iconColor = 'text-red-400';
-      icon = <TbAlertCircle className="h-6 w-6" />;
-      break;
-    case 'info':
-    default:
-      bgColor = 'bg-blue-500/20';
-      iconColor = 'text-blue-400';
-      icon = <TbInfoCircle className="h-6 w-6" />;
-      break;
-  }
-  
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
-      <div className={`relative rounded-xl ${bgColor} backdrop-blur-md p-4 border border-white/10 shadow-xl max-w-md w-full mx-4 transform transition-all duration-300 ease-in-out scale-100`}>
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-white/60 hover:text-white transition-colors"
-        >
-          <TbX className="h-5 w-5" />
-        </button>
-        <div className="flex items-center">
-          <div className={`mr-3 ${iconColor}`}>{icon}</div>
-          <p className="text-white text-sm font-medium">{message}</p>
-        </div>
-      </div>
-    </div>
-  );
+// Import components
+import ProfileForm from './components/ProfileForm';
+import SecurityForm from './components/SecurityForm';
+import NotificationsForm from './components/NotificationsForm';
+import ProfileSidebar from './components/ProfileSidebar';
+import NotificationModal from './components/NotificationModal';
+import { PiUserDuotone } from 'react-icons/pi';
+
+// Animation variants for page transitions
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
 };
 
+/**
+ * ProfilePage Component
+ * Main component for user profile management
+ */
 const ProfilePage = () => {
-  const { user, updateProfile, updatePassword, updateNotificationSettings, loading } = useAuth();
+  const { user, updateProfile, updatePassword, updateNotificationSettings, logout } = useAuth();
   
   // Notification state
   const [notification, setNotification] = useState({
@@ -80,10 +40,10 @@ const ProfilePage = () => {
       message
     });
     
-    // Auto-hide notification after 3 seconds
+    // Auto-hide notification after 4 seconds
     setTimeout(() => {
       setNotification(prev => ({ ...prev, isVisible: false }));
-    }, 3000);
+    }, 4000);
   };
   
   // Close notification helper function
@@ -104,6 +64,11 @@ const ProfilePage = () => {
     newPasswordConfirm: '',
   });
   
+  // Password visibility toggles
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   // Notification settings state
   const [notificationSettings, setNotificationSettings] = useState({
     email_notifications: true,
@@ -121,6 +86,40 @@ const ProfilePage = () => {
   
   // Active tab
   const [activeTab, setActiveTab] = useState('profile');
+  
+  // Activity log (simulated data)
+  const [recentActivity] = useState([
+    { type: 'login', device: 'Desktop - Chrome', location: 'New York, USA', date: new Date(Date.now() - 1000 * 60 * 5) },
+    { type: 'transaction', name: 'Added expense', amount: '$45.99', category: 'Groceries', date: new Date(Date.now() - 1000 * 60 * 60 * 2) },
+    { type: 'settings', name: 'Updated profile', date: new Date(Date.now() - 1000 * 60 * 60 * 24) },
+    { type: 'login', device: 'Mobile - Safari', location: 'New York, USA', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2) },
+  ]);
+  
+  // Password strength indicator
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, label: 'None', color: 'bg-white/10' };
+    
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+    const length = password.length;
+    
+    let strength = 0;
+    if (length >= 8) strength += 1;
+    if (length >= 12) strength += 1;
+    if (hasLower) strength += 1;
+    if (hasUpper) strength += 1;
+    if (hasNumber) strength += 1;
+    if (hasSpecial) strength += 1;
+    
+    if (strength <= 2) return { strength: 20, label: 'Weak', color: 'bg-rose-500' };
+    if (strength <= 4) return { strength: 50, label: 'Moderate', color: 'bg-amber-500' };
+    if (strength <= 5) return { strength: 80, label: 'Strong', color: 'bg-emerald-500' };
+    return { strength: 100, label: 'Very Strong', color: 'bg-green-400' };
+  };
+  
+  const passwordStrength = getPasswordStrength(passwordForm.newPassword);
   
   // Initialize form with user data
   useEffect(() => {
@@ -201,20 +200,36 @@ const ProfilePage = () => {
   const validatePasswordForm = () => {
     const errors = {};
     
+    // Validate current password
     if (!passwordForm.currentPassword) {
       errors.currentPassword = 'Current password is required';
+    } else if (passwordForm.currentPassword.trim() === '') {
+      errors.currentPassword = 'Current password cannot be empty';
     }
     
+    // Validate new password
     if (!passwordForm.newPassword) {
       errors.newPassword = 'New password is required';
+    } else if (passwordForm.newPassword.trim() === '') {
+      errors.newPassword = 'New password cannot be empty';
     } else if (passwordForm.newPassword.length < 8) {
       errors.newPassword = 'Password must be at least 8 characters';
     }
     
+    // Validate password confirmation
     if (!passwordForm.newPasswordConfirm) {
       errors.newPasswordConfirm = 'Please confirm your new password';
+    } else if (passwordForm.newPasswordConfirm.trim() === '') {
+      errors.newPasswordConfirm = 'Password confirmation cannot be empty';
     } else if (passwordForm.newPassword !== passwordForm.newPasswordConfirm) {
       errors.newPasswordConfirm = 'Passwords do not match';
+    }
+    
+    // Check if new password is the same as current password
+    if (passwordForm.currentPassword && 
+        passwordForm.newPassword && 
+        passwordForm.currentPassword === passwordForm.newPassword) {
+      errors.newPassword = 'New password must be different from current password';
     }
     
     setPasswordErrors(errors);
@@ -252,7 +267,16 @@ const ProfilePage = () => {
     
     setPasswordLoading(true);
     try {
+      // Log the password data being sent (without showing actual passwords)
+      console.log('Updating password with form data structure:', {
+        currentPassword: passwordForm.currentPassword ? '[PROVIDED]' : '[MISSING]',
+        newPassword: passwordForm.newPassword ? '[PROVIDED]' : '[MISSING]',
+        newPasswordConfirm: passwordForm.newPasswordConfirm ? '[PROVIDED]' : '[MISSING]',
+      });
+      
+      // Call the updatePassword function with the password data
       await updatePassword(passwordForm);
+      
       showNotification('success', 'Password updated successfully');
       
       // Reset password form
@@ -261,9 +285,15 @@ const ProfilePage = () => {
         newPassword: '',
         newPasswordConfirm: '',
       });
+      
+      // Clear any password errors
+      setPasswordErrors({});
     } catch (error) {
       console.error('Error updating password:', error);
-      showNotification('error', error.response?.data?.message || 'Failed to update password');
+      
+      // Show a more specific error message if available
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update password';
+      showNotification('error', errorMessage);
       
       // Set form errors if they exist in the response
       if (error.response?.data?.errors) {
@@ -290,372 +320,112 @@ const ProfilePage = () => {
     }
   };
   
-  // Tab content components
-  const ProfileTabContent = () => (
-    <form onSubmit={handleProfileUpdate} className="space-y-6">
-      <div className="space-y-2">
-        <label htmlFor="name" className="block text-sm font-medium text-white/80 ml-1">
-          Full Name
-        </label>
-        <div className="relative">
-          <TbUser className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={profileForm.name}
-            onChange={handleProfileChange}
-            className={`block w-full pl-10 pr-3 py-2.5 border ${
-              profileErrors.name ? 'border-red-500/50' : 'border-white/10'
-            } bg-white/5 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
-            placeholder="Your full name"
-          />
-        </div>
-        {profileErrors.name && (
-          <p className="mt-1 text-sm text-red-400 ml-1">{profileErrors.name}</p>
-        )}
-      </div>
-      
-      <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-medium text-white/80 ml-1">
-          Email Address
-        </label>
-        <div className="relative">
-          <TbMail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={profileForm.email}
-            onChange={handleProfileChange}
-            className={`block w-full pl-10 pr-3 py-2.5 border ${
-              profileErrors.email ? 'border-red-500/50' : 'border-white/10'
-            } bg-white/5 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
-            placeholder="you@example.com"
-          />
-        </div>
-        {profileErrors.email && (
-          <p className="mt-1 text-sm text-red-400 ml-1">{profileErrors.email}</p>
-        )}
-      </div>
-      
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={profileLoading}
-          className="group relative w-full flex justify-center items-center py-2.5 px-4 rounded-xl text-white overflow-hidden transition-all duration-300 transform disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {/* Button background with gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-500/80 to-primary-600 transition-all duration-300 group-hover:from-primary-700 group-hover:to-primary-500"></div>
-
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-
-          {/* Button content */}
-          <span className="relative flex items-center">
-            {profileLoading ? (
-              <>
-                <TbLoader2 className="animate-spin mr-2 h-4 w-4 text-white" />
-                Updating...
-              </>
-            ) : (
-              <>
-                <TbDeviceFloppy className="mr-2 h-4 w-4" />
-                Save Changes
-              </>
-            )}
-          </span>
-        </button>
-      </div>
-    </form>
-  );
-  
-  const SecurityTabContent = () => (
-    <form onSubmit={handlePasswordUpdate} className="space-y-6">
-      <div className="space-y-2">
-        <label htmlFor="currentPassword" className="block text-sm font-medium text-white/80 ml-1">
-          Current Password
-        </label>
-        <div className="relative">
-          <TbLock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
-          <input
-            id="currentPassword"
-            name="currentPassword"
-            type="password"
-            value={passwordForm.currentPassword}
-            onChange={handlePasswordChange}
-            className={`block w-full pl-10 pr-3 py-2.5 border ${
-              passwordErrors.currentPassword ? 'border-red-500/50' : 'border-white/10'
-            } bg-white/5 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
-            placeholder="••••••••"
-          />
-        </div>
-        {passwordErrors.currentPassword && (
-          <p className="mt-1 text-sm text-red-400 ml-1">{passwordErrors.currentPassword}</p>
-        )}
-      </div>
-      
-      <div className="space-y-2">
-        <label htmlFor="newPassword" className="block text-sm font-medium text-white/80 ml-1">
-          New Password
-        </label>
-        <div className="relative">
-          <TbShieldLock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
-          <input
-            id="newPassword"
-            name="newPassword"
-            type="password"
-            value={passwordForm.newPassword}
-            onChange={handlePasswordChange}
-            className={`block w-full pl-10 pr-3 py-2.5 border ${
-              passwordErrors.newPassword ? 'border-red-500/50' : 'border-white/10'
-            } bg-white/5 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
-            placeholder="••••••••"
-          />
-        </div>
-        {passwordErrors.newPassword && (
-          <p className="mt-1 text-sm text-red-400 ml-1">{passwordErrors.newPassword}</p>
-        )}
-      </div>
-      
-      <div className="space-y-2">
-        <label htmlFor="newPasswordConfirm" className="block text-sm font-medium text-white/80 ml-1">
-          Confirm New Password
-        </label>
-        <div className="relative">
-          <TbShieldLock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
-          <input
-            id="newPasswordConfirm"
-            name="newPasswordConfirm"
-            type="password"
-            value={passwordForm.newPasswordConfirm}
-            onChange={handlePasswordChange}
-            className={`block w-full pl-10 pr-3 py-2.5 border ${
-              passwordErrors.newPasswordConfirm ? 'border-red-500/50' : 'border-white/10'
-            } bg-white/5 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200`}
-            placeholder="••••••••"
-          />
-        </div>
-        {passwordErrors.newPasswordConfirm && (
-          <p className="mt-1 text-sm text-red-400 ml-1">{passwordErrors.newPasswordConfirm}</p>
-        )}
-      </div>
-      
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={passwordLoading}
-          className="group relative w-full flex justify-center items-center py-2.5 px-4 rounded-xl text-white overflow-hidden transition-all duration-300 transform disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {/* Button background with gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-500/80 to-primary-600 transition-all duration-300 group-hover:from-primary-700 group-hover:to-primary-500"></div>
-
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-
-          {/* Button content */}
-          <span className="relative flex items-center">
-            {passwordLoading ? (
-              <>
-                <TbLoader2 className="animate-spin mr-2 h-4 w-4 text-white" />
-                Updating...
-              </>
-            ) : (
-              <>
-                <TbShieldLock className="mr-2 h-4 w-4" />
-                Update Password
-              </>
-            )}
-          </span>
-        </button>
-      </div>
-    </form>
-  );
-  
-  const NotificationsTabContent = () => (
-    <form onSubmit={handleNotificationUpdate} className="space-y-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <TbBell className="h-5 w-5 text-primary-500 mr-3" />
-            <span className="text-sm font-medium text-white">Email Notifications</span>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              name="email_notifications"
-              checked={notificationSettings.email_notifications}
-              onChange={handleNotificationChange}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-white/10 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-          </label>
-        </div>
-        
-        <div className="space-y-2 pl-8">
-          <label htmlFor="reminder_frequency" className="block text-sm font-medium text-white/80">
-            Reminder Frequency
-          </label>
-          <select
-            id="reminder_frequency"
-            name="reminder_frequency"
-            value={notificationSettings.reminder_frequency}
-            onChange={handleNotificationChange}
-            className="block w-full py-2.5 px-3 border border-white/10 bg-white/5 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-            disabled={!notificationSettings.email_notifications}
-          >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="never">Never</option>
-          </select>
-        </div>
-      </div>
-      
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={notificationsLoading}
-          className="group relative w-full flex justify-center items-center py-2.5 px-4 rounded-xl text-white overflow-hidden transition-all duration-300 transform disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {/* Button background with gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-500/80 to-primary-600 transition-all duration-300 group-hover:from-primary-700 group-hover:to-primary-500"></div>
-
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-
-          {/* Button content */}
-          <span className="relative flex items-center">
-            {notificationsLoading ? (
-              <>
-                <TbLoader2 className="animate-spin mr-2 h-4 w-4 text-white" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <TbDeviceFloppy className="mr-2 h-4 w-4" />
-                Save Preferences
-              </>
-            )}
-          </span>
-        </button>
-      </div>
-    </form>
-  );
-  
   // Render tab content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileTabContent />;
+        return (
+          <ProfileForm
+            user={user}
+            profileForm={profileForm}
+            handleProfileChange={handleProfileChange}
+            handleProfileUpdate={handleProfileUpdate}
+            profileErrors={profileErrors}
+            profileLoading={profileLoading}
+          />
+        );
       case 'security':
-        return <SecurityTabContent />;
+        return (
+          <SecurityForm
+            passwordForm={passwordForm}
+            handlePasswordChange={handlePasswordChange}
+            handlePasswordUpdate={handlePasswordUpdate}
+            passwordErrors={passwordErrors}
+            passwordLoading={passwordLoading}
+            passwordStrength={passwordStrength}
+            showCurrentPassword={showCurrentPassword}
+            showNewPassword={showNewPassword}
+            showConfirmPassword={showConfirmPassword}
+            setShowCurrentPassword={setShowCurrentPassword}
+            setShowNewPassword={setShowNewPassword}
+            setShowConfirmPassword={setShowConfirmPassword}
+          />
+        );
       case 'notifications':
-        return <NotificationsTabContent />;
+        return (
+          <NotificationsForm
+            notificationSettings={notificationSettings}
+            handleNotificationChange={handleNotificationChange}
+            handleNotificationUpdate={handleNotificationUpdate}
+            notificationsLoading={notificationsLoading}
+          />
+        );
       default:
-        return <ProfileTabContent />;
+        return (
+          <ProfileForm
+            user={user}
+            profileForm={profileForm}
+            handleProfileChange={handleProfileChange}
+            handleProfileUpdate={handleProfileUpdate}
+            profileErrors={profileErrors}
+            profileLoading={profileLoading}
+          />
+        );
     }
   };
   
   return (
     <MainLayout>
-      {/* Custom notification modal */}
-      <NotificationModal
-        type={notification.type}
-        message={notification.message}
+      <NotificationModal 
+        type={notification.type} 
+        message={notification.message} 
         isVisible={notification.isVisible}
         onClose={closeNotification}
       />
       
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Profile Settings</h1>
-          <p className="mt-2 text-white/60">
-            Manage your account settings and preferences
-          </p>
+      <motion.div 
+        className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-2"
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+      >
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+          <div>
+            <h1 className="text-xl md:ext-2xl md:text-3xl font-bold text-primary-500/80">
+             
+              Account Profile Settings
+            </h1>
+            <p className="mt-2 text-white/60 text-sm md:text-base">Manage your account settings and preferences</p>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Sidebar */}
-          <div className="md:col-span-1">
-            <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-white/5 shadow-lg">
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary-500 to-primary-700 flex items-center justify-center text-white mb-3">
-                  <TbUserCircle className="w-12 h-12" />
-                </div>
-                <h3 className="text-lg font-semibold text-white">{user?.name}</h3>
-                <p className="text-sm text-white/60">{user?.email}</p>
-              </div>
-              
-              <nav className="space-y-1">
-                <button
-                  onClick={() => setActiveTab('profile')}
-                  className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    activeTab === 'profile'
-                      ? 'bg-primary-600/30 text-primary-300'
-                      : 'text-white/70 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <TbUser className={`mr-3 h-5 w-5 ${activeTab === 'profile' ? 'text-primary-400' : 'text-white/60'}`} />
-                  Personal Information
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('security')}
-                  className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    activeTab === 'security'
-                      ? 'bg-primary-600/30 text-primary-300'
-                      : 'text-white/70 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <TbShieldLock className={`mr-3 h-5 w-5 ${activeTab === 'security' ? 'text-primary-400' : 'text-white/60'}`} />
-                  Security
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('notifications')}
-                  className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    activeTab === 'notifications'
-                      ? 'bg-primary-600/30 text-primary-300'
-                      : 'text-white/70 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <TbBell className={`mr-3 h-5 w-5 ${activeTab === 'notifications' ? 'text-primary-400' : 'text-white/60'}`} />
-                  Notifications
-                </button>
-              </nav>
-            </div>
+          <div className="md:col-span-4">
+            <ProfileSidebar
+              user={user}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              logout={logout}
+            />
           </div>
           
           {/* Main content */}
-          <div className="md:col-span-3">
-            <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-white/5 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                {activeTab === 'profile' && (
-                  <>
-                    <TbUser className="mr-2 h-5 w-5 text-primary-500" />
-                    Personal Information
-                  </>
-                )}
-                {activeTab === 'security' && (
-                  <>
-                    <TbShieldLock className="mr-2 h-5 w-5 text-primary-500" />
-                    Security Settings
-                  </>
-                )}
-                {activeTab === 'notifications' && (
-                  <>
-                    <TbBell className="mr-2 h-5 w-5 text-primary-500" />
-                    Notification Preferences
-                  </>
-                )}
-              </h2>
-              
+          <div className="md:col-span-8">
+            <motion.div 
+              className="bg-slate-800/50 backdrop-blur-xl rounded-2xl -mx-1 p-4 md:p-6 border border-white/5 shadow-xl"
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
               {renderTabContent()}
-            </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </MainLayout>
   );
 };

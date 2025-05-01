@@ -212,7 +212,7 @@ const Login = () => {
         <div className="lg:hidden mt-12 space-y-6 max-w-md">
           <h3 className="text-xl font-semibold text-white/90 text-center">Why choose FinanceFlow?</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {features.slice(0, 2).map((feature, index) => (
+            {features.slice(0, 3).map((feature, index) => (
               <div 
                 key={index} 
                 className="flex items-start space-x-3 p-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10"

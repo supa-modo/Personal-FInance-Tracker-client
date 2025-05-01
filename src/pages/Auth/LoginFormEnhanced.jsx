@@ -3,16 +3,8 @@
 
 import React from "react";
 import {
-  TbLock,
-  TbMail,
-  TbEye,
-  TbEyeOff,
-  TbArrowRight,
   TbChevronRight,
-  TbBrandGoogle,
   TbBrandApple,
-  TbFingerprint,
-  TbShieldLock,
   TbChartPie,
   TbMailFilled,
   TbLoader2,
@@ -51,7 +43,7 @@ const LoginFormEnhanced = ({
       {/* Glass card effect */}
       <div className="absolute inset-0 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-white/5"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 backdrop-blur-xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/5 backdrop-blur-xl"></div>
       </div>
 
       <div className="relative z-10">

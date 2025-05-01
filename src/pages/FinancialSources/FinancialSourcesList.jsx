@@ -117,13 +117,13 @@ const FinancialSourcesList = () => {
   // Helper function to get type icon
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'BANK_ACCOUNT': return <TbBuildingBank className="h-5 w-5 text-white" />;
-      case 'MONEY_MARKET': return <TbPigMoney className="h-5 w-5 text-white" />;
-      case 'STOCKS': return <TbTrendingUp className="h-5 w-5 text-white" />;
-      case 'MPESA': return <TbCreditCard className="h-5 w-5 text-white" />;
-      case 'SACCO': return <TbWallet className="h-5 w-5 text-white" />;
-      case 'OTHER': return <TbCurrencyDollar className="h-5 w-5 text-white" />;
-      default: return <TbCurrencyDollar className="h-5 w-5 text-white" />;
+      case 'BANK_ACCOUNT': return <TbBuildingBank className="h-6 w-6 text-white" />;
+      case 'MONEY_MARKET': return <TbPigMoney className="h-6 w-6 text-white" />;
+      case 'STOCKS': return <TbTrendingUp className="h-6 w-6 text-white" />;
+      case 'MPESA': return <TbCreditCard className="h-6 w-6 text-white" />;
+      case 'SACCO': return <TbWallet className="h-6 w-6 text-white" />;
+      case 'OTHER': return <TbCurrencyDollar className="h-6 w-6 text-white" />;
+      default: return <TbCurrencyDollar className="h-6 w-6 text-white" />;
     }
   };
   

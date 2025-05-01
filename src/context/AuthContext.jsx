@@ -107,6 +107,15 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
+      // Validate password data
+      if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.newPasswordConfirm) {
+        throw new Error('All password fields are required');
+      }
+      
+      if (passwordData.newPassword !== passwordData.newPasswordConfirm) {
+        throw new Error('New password and confirmation do not match');
+      }
+      
       // Call the update password service
       const updatedUser = await authService.updatePassword(
         passwordData.currentPassword,
@@ -114,10 +123,12 @@ export const AuthProvider = ({ children }) => {
         passwordData.newPasswordConfirm
       );
       
-      // Update the state
+      // Update the state with the latest user data
       setUser(updatedUser);
+      
       return updatedUser;
     } catch (error) {
+      console.error('Password update error:', error);
       setError(error.message);
       throw error;
     } finally {

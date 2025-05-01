@@ -14,7 +14,7 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-primary-500">Financial Sources</h2>
           <Link
-            to="/financial-sources/new"
+            to="/financial-sources"
             className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 shadow-lg shadow-primary-900/30"
           >
             <TbPlus className="-ml-1 mr-1 h-4 w-4" />
@@ -32,7 +32,7 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
                     <div className="flex-shrink-0">
                       <div
                         className="inline-flex items-center justify-center h-12 w-12 rounded-lg shadow-lg"
-                        style={{ backgroundColor: source.colorCode }}
+                        style={{ backgroundColor: source.colorCode || '#3b82f6' }}
                       >
                         {getTypeIcon(source.type)}
                       </div>
@@ -82,7 +82,7 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
             <p className="mt-1 text-sm text-slate-400">Get started by adding your first financial source.</p>
             <div className="mt-6">
               <Link
-                to="/financial-sources/new"
+                to="/financial-sources"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-500 transition-all duration-300 shadow-lg shadow-primary-900/30"
               >
                 <TbPlus className="-ml-1 mr-2 h-5 w-5" />

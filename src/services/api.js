@@ -3,7 +3,7 @@ import axios from "axios";
 // API base URL from environment variables or default
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 
-// Token storage keys
+// User storage key
 export const USER_KEY = "user-personal-finance";
 
 // Configure axios to include credentials (cookies) for all requests
@@ -11,7 +11,6 @@ axios.defaults.withCredentials = true;
 
 // Enable debug logging based on environment variable
 export const ENABLE_DEBUG_LOGGING = import.meta.env.VITE_ENABLE_DEBUG_LOGGING === "true";
-
 
 // Create axios instance with auth interceptors
 export const apiClient = axios.create({
@@ -28,8 +27,9 @@ apiClient.defaults.withCredentials = true;
 // Add request interceptor for authentication
 apiClient.interceptors.request.use(
   (config) => {
-    // We're using HttpOnly cookies for authentication, so no need to set Authorization header
-    // The browser will automatically include the cookies in the request
+    // We don't need to add an Authorization header because the JWT token
+    // is already being sent in the HTTP-only cookie by the browser automatically
+    // when withCredentials is set to true
     
     // Debug logging
     if (ENABLE_DEBUG_LOGGING) {
@@ -69,9 +69,11 @@ apiClient.interceptors.response.use(
         
         // Only redirect to login if not already on login page and not a background API check
         const isLoginPage = window.location.pathname.includes('/login');
+        const isRegisterPage = window.location.pathname.includes('/register');
         const isAuthEndpoint = error.config.url.includes('/auth/me');
         
-        if (!isLoginPage && !isAuthEndpoint) {
+        // Don't redirect if we're on login/register page or if this is just a background check
+        if (!isLoginPage && !isRegisterPage && !isAuthEndpoint) {
           console.log('Redirecting to login due to 401 error');
           window.location.href = '/login';
         }
@@ -108,9 +110,4 @@ export default {
   apiClient,
   safeApiCall,
   ENABLE_DEBUG_LOGGING,
-  get: (url, config) => apiClient.get(url, config),
-  post: (url, data, config) => apiClient.post(url, data, config),
-  put: (url, data, config) => apiClient.put(url, data, config),
-  patch: (url, data, config) => apiClient.patch(url, data, config),
-  delete: (url, config) => apiClient.delete(url, config)
 };

@@ -6,7 +6,8 @@ import {
   TbTrash, 
   TbRefresh,
   TbCurrencyDollar,
-  TbEdit
+  TbEdit,
+  TbCoins
 } from 'react-icons/tb';
 import { formatCurrency, getRelativeTimeString } from '../../../utils/formatters';
 
@@ -35,9 +36,9 @@ const SourceHeaderEnhanced = ({
             <div className="flex items-center">
               <div 
                 className="flex-shrink-0 h-12 md:h-16 w-12 md:w-16 rounded-xl shadow-lg flex items-center justify-center"
-                style={{ backgroundColor: source?.colorCode }}
+                style={{ backgroundColor: source?.colorCode || '#3b82f6'}}
               >
-                <TbCurrencyDollar className="h-8 w-8 text-white" />
+                <TbCoins className="h-9 w-9 text-white" />
               </div>
               <div className="ml-5">
                 <h1 className="text-lg md:text-2xl font-bold text-white">

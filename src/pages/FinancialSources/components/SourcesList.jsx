@@ -77,7 +77,7 @@ const SourcesList = ({
                   <div className="flex items-center flex-1 min-w-0">
                     <div 
                       className="flex-shrink-0 h-12 w-12 rounded-lg shadow-lg flex items-center justify-center"
-                      style={{ backgroundColor: source.colorCode }}
+                      style={{ backgroundColor: source.colorCode || '#3b82f6'}}
                     >
                       {getTypeIcon(source.type)}
                     </div>
