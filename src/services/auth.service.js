@@ -1,4 +1,4 @@
-import apiClient from './api.service';
+import apiClient, { setToken } from './api.service';
 
 /**
  * Authentication service for handling user authentication
@@ -21,6 +21,8 @@ export const login = async (email, password) => {
       throw new Error('Email and password are required');
     }
 
+    console.log('Attempting login with email:', email);
+
     // Make the API call with credentials
     const response = await apiClient.post('/auth/login', {
       email,
@@ -33,7 +35,13 @@ export const login = async (email, password) => {
       // We only need to store the user data
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
       
-      console.log('Login successful, user data stored in localStorage');
+      // If token is provided directly in the response, store it in memory
+      if (response.data.token) {
+        setToken(response.data.token);
+        console.log('Token received and stored during login');
+      }
+      
+      console.log('Login successful, user data stored');
       return response.data.data.user;
     }
     

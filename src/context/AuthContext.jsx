@@ -23,13 +23,22 @@ export const AuthProvider = ({ children }) => {
           setUser(storedUser);
         }
         
+        // Log the environment and authentication attempt
+        console.log(`Checking authentication in ${import.meta.env.MODE} mode`);
+        
         // Then validate with the backend and get fresh data
         const currentUser = await authService.fetchCurrentUser();
         if (currentUser) {
+          console.log('User authenticated successfully with backend');
           setUser(currentUser);
         } else if (storedUser) {
           // If backend says no user but we had one in localStorage, clear it
+          console.log('Backend authentication failed, clearing local user data');
           setUser(null);
+          // Redirect to login if we're not already there
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
         }
       } catch (error) {
         console.error('Error checking authentication:', error);

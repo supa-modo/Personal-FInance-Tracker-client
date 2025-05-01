@@ -244,7 +244,7 @@ const Login = () => {
       </div>
       
       {/* CSS for animations and patterns */}
-      <style jsx>{`
+      <style>{`
         @keyframes shimmer {
           0% {
             transform: translateX(-100%);

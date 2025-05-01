@@ -135,7 +135,7 @@ const MainLayout = ({ children }) => {
                         role="menuitem"
                       >
                         <div className="flex items-center">
-                          <TbUserCircle className="mr-2 h-4 w-4" />
+                          <PiUserDuotone className="mr-2 h-4 w-4" />
                           Profile Settings
                         </div>
                       </Link>
@@ -198,7 +198,7 @@ const MainLayout = ({ children }) => {
                 onClick={closeMobileMenu}
                 className="flex w-full items-center pl-3 pr-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-700/30 hover:text-white border-l-4 border-transparent transition-colors"
               >
-                <TbUserCircle size={20} className="mr-3" />
+                <PiUserDuotone size={20} className="mr-3" />
                 Profile Settings
               </Link>
               <button
