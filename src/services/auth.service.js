@@ -1,13 +1,8 @@
-import axios from 'axios';
+import apiClient from './api.service';
 
 /**
  * Authentication service for handling user authentication
  */
-
-// API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
-
-axios.defaults.withCredentials = true;
 
 /**
  * Logs in a user with the specified email and password.
@@ -27,19 +22,16 @@ export const login = async (email, password) => {
     }
 
     // Make the API call with credentials
-    const response = await axios.post(`${API_URL}/auth/login`, {
+    const response = await apiClient.post('/auth/login', {
       email,
       password
-    }, { withCredentials: true });
+    });
     
     // Store user data in localStorage
     if (response.data && response.data.data && response.data.data.user) {
       // The JWT token is stored in an HttpOnly cookie by the server
       // We only need to store the user data
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
-      
-      // Ensure axios is configured to send cookies with every request
-      axios.defaults.withCredentials = true;
       
       console.log('Login successful, user data stored in localStorage');
       return response.data.data.user;
@@ -64,7 +56,7 @@ export const login = async (email, password) => {
  */
 export const register = async (name, email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, {
+    const response = await apiClient.post('/auth/register', {
       name,
       email,
       password,
@@ -92,7 +84,7 @@ export const register = async (name, email, password) => {
 export const logout = async () => {
   try {
     // Call the logout endpoint to clear cookies
-    await axios.get(`${API_URL}/auth/logout`);
+    await apiClient.get('/auth/logout');
     
     // Remove the user from localStorage
     localStorage.removeItem('user-personal-finance');
@@ -113,8 +105,7 @@ export const logout = async () => {
  */
 export const fetchCurrentUser = async () => {
   try {
-    // Ensure we're sending cookies with the request
-    const response = await axios.get(`${API_URL}/auth/me`, { withCredentials: true });
+    const response = await apiClient.get('/auth/me');
     
     if (response.data && response.data.data && response.data.data.user) {
       // Update localStorage with latest user data
@@ -171,11 +162,11 @@ export const updatePassword = async (currentPassword, newPassword, newPasswordCo
     }
 
     // Make the API call with proper credentials
-    const response = await axios.patch(`${API_URL}/auth/update-password`, {
+    const response = await apiClient.patch('/auth/update-password', {
       currentPassword,
       newPassword,
       newPasswordConfirm
-    }, { withCredentials: true });
+    });
     
     if (response.data && response.data.data && response.data.data.user) {
       // Update the user in localStorage with the latest data
@@ -198,7 +189,7 @@ export const updatePassword = async (currentPassword, newPassword, newPasswordCo
  */
 export const updateProfile = async (profileData) => {
   try {
-    const response = await axios.patch(`${API_URL}/auth/update-profile`, profileData);
+    const response = await apiClient.patch('/auth/update-profile', profileData);
     
     if (response.data && response.data.data && response.data.data.user) {
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
@@ -220,7 +211,7 @@ export const updateProfile = async (profileData) => {
  */
 export const updateNotificationSettings = async (settingsData) => {
   try {
-    const response = await axios.patch(`${API_URL}/auth/update-notification-settings`, settingsData);
+    const response = await apiClient.patch('/auth/update-notification-settings', settingsData);
     
     if (response.data && response.data.data && response.data.data.user) {
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
