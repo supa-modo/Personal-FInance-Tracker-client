@@ -69,7 +69,8 @@ const FinancialSourceDetail = () => {
   };
 
   const handleEditSource = (updatedSource) => {
-    updateFinancialSource(updatedSource);
+    // Make sure we're passing the ID and the updated source data separately
+    updateFinancialSource(source.id, updatedSource);
     setIsEditModalOpen(false);
     // Update the local source state to reflect changes immediately
     setSource((prev) => ({ ...prev, ...updatedSource }));

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PiMoneyWavyDuotone } from 'react-icons/pi';
 import { 
   TbX, 
   TbPlus, 
@@ -15,6 +16,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
   const [formData, setFormData] = useState({
     name: '',
     type: 'BANK_ACCOUNT',
+    institution: '',
     description: '',
     colorCode: '#4F46E5', // Default color - primary indigo
     isActive: true
@@ -28,6 +30,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
     { value: 'STOCKS', label: 'Stocks', icon: <TbTrendingUp className="h-5 w-5" /> },
     { value: 'MPESA', label: 'M-Pesa', icon: <TbCreditCard className="h-5 w-5" /> },
     { value: 'SACCO', label: 'SACCO', icon: <TbWallet className="h-5 w-5" /> },
+    { value: 'CASH', label: 'Cash Money', icon: <PiMoneyWavyDuotone className="h-5 w-5" /> },
     { value: 'OTHER', label: 'Other', icon: <TbCurrencyDollar className="h-5 w-5" /> },
   ];
   
@@ -74,6 +77,10 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
+
+    if (!formData.instituiton.trim()) {
+      newErrors.instituiton = 'Institution is required';
+    }
     
     if (!formData.type) {
       newErrors.type = 'Type is required';
@@ -100,6 +107,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
       setFormData({
         name: '',
         type: 'BANK_ACCOUNT',
+        institution: '',
         description: '',
         colorCode: '##3B82F6',
         isActive: true
@@ -175,6 +183,34 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
                 <p className="mt-1 text-sm text-red-400">{errors.name}</p>
               )}
             </div>
+
+             {/* Institution field */}
+             <div>
+              <label htmlFor="name" className="block text-sm font-medium text-slate-300">
+                Institution
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  type="text"
+                  name="institution"
+                  id="institution"
+                  value={formData.institution}
+                  onChange={handleChange}
+                  className={`block w-full px-3 py-2.5 border ${
+                    errors.institution ? 'border-red-500' : 'border-slate-600'
+                  } bg-slate-800/50 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400`}
+                  placeholder="e.g., Savings Account"
+                />
+                {errors.institution && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <TbAlertCircle className="h-5 w-5 text-red-400" />
+                  </div>
+                )}
+              </div>
+              {errors.institution && (
+                <p className="mt-1 text-sm text-red-400">{errors.institution}</p>
+              )}
+            </div>
             
             {/* Type field */}
             <div>
@@ -222,7 +258,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
             </div>
             
             {/* Color selection */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Color
               </label>
@@ -239,7 +275,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
                   />
                 ))}
               </div>
-            </div>
+            </div> */}
             
             {/* Active toggle */}
             <div className="flex items-center">

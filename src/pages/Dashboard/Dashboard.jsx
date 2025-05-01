@@ -11,6 +11,9 @@ import DashboardCharts from './components/DashboardCharts';
 import FinancialSourcesList from './components/FinancialSourcesList';
 import QuickActions from './components/QuickActions';
 import { LoadingState, ErrorState } from './components/DashboardStates';
+import AssetsTabComponent from './components/AssetsTabComponent';
+import TrendsTabComponent from './components/TrendsTabComponent';
+import ReportsComponent from './components/ReportsComponent';
 
 // Import icons
 import {
@@ -192,17 +195,20 @@ const Dashboard = () => {
             netWorth={netWorth}
             totalAssets={totalAssets}
             change={change}
-            activeSources={activeSources}
+            activeSources={activeSources.length}
             sourceData={sourceData}
           />
-           <QuickActions />
+          <QuickActions />
           
           <DashboardCharts 
             lineChartData={lineChartData}
             pieChartData={pieChartData}
           />
           
-         
+          {/* <ReportsComponent 
+            financialSources={financialSources}
+            historicalData={historicalData}
+          /> */}
           
           <FinancialSourcesList 
             sourceData={sourceData}
@@ -210,6 +216,19 @@ const Dashboard = () => {
             getTypeLabel={getTypeLabel}
           />
         </>
+      )}
+      
+      {activeTab === 'assets' && (
+        <AssetsTabComponent 
+          financialSources={financialSources}
+        />
+      )}
+      
+      {activeTab === 'trends' && (
+        <TrendsTabComponent 
+          historicalData={historicalData}
+          financialSources={financialSources}
+        />
       )}
     </MainLayout>
   );

@@ -14,8 +14,8 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
   return (
     <div className="px-2 md:px-0 grid grid-cols-1 gap-2.5 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {/* Net worth card */}
-      <div className="bg-slate-800/60 overflow-hidden shadow-xl rounded-2xl md:rounded-xl border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
-        <div className="px-3 md:px-6 py-4 md:py-6">
+      <div className="bg-slate-800/60 overflow-hidden shadow-xl rounded-2xl md:rounded-xl border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300 flex flex-col h-full">
+        <div className="px-3 md:px-6 py-4 md:py-6 flex-grow">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-3 shadow-lg shadow-blue-500/20">
               <TbCurrencyDollar className="h-8 w-8 text-white" />
@@ -50,7 +50,7 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
             </div>
           </div>
         </div>
-        <div className="bg-slate-700/30 px-6 py-3">
+        <div className="bg-slate-700/30 px-6 py-3 mt-auto">
           <div className="text-sm">
             <Link to="/financial-sources" className=" text-primary-400 hover:text-primary-300 flex items-center">
               View all sources
@@ -60,11 +60,11 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
         </div>
       </div>
       
-      {/* Total Assets card */}
-      <div className="bg-slate-800/60 overflow-hidden shadow-xl rounded-xl border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
-        <div className="px-3 md:px-6 py-4 md:py-6">
+      {/* Total assets card */}
+      <div className="bg-slate-800/60 overflow-hidden shadow-xl rounded-2xl md:rounded-xl border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300 flex flex-col h-full">
+        <div className="px-3 md:px-6 py-4 md:py-6 flex-grow">
           <div className="flex items-center">
-            <div className="flex-shrink-0 bg-gradient-to-r from-green-400 to-green-600 rounded-xl p-3 shadow-lg shadow-green-500/20">
+            <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl p-3 shadow-lg shadow-emerald-500/20">
               <TbWallet className="h-8 w-8 text-white" />
             </div>
             <div className="ml-5 w-0 flex-1">
@@ -77,26 +77,26 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
                     {formatCurrency(totalAssets)}
                   </div>
                   <div className="mt-1 text-sm text-slate-400">
-                    Across {activeSources.length} financial sources
+                    Across {activeSources} active sources
                   </div>
                 </dd>
               </dl>
             </div>
           </div>
         </div>
-        <div className="bg-slate-700/30 px-6 py-3">
+        <div className="bg-slate-700/30 px-6 py-3 mt-auto">
           <div className="text-sm">
-            <button className=" text-primary-400 hover:text-primary-300 flex items-center">
+            <Link to="/financial-sources" className="text-primary-400 hover:text-primary-300 flex items-center">
               View breakdown
               <TbChevronRight className="ml-1 h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
       
       {/* Last Updated card */}
-      <div className="bg-slate-800/60 overflow-hidden shadow-xl rounded-xl border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
-        <div className="px-3 md:px-6 py-4 md:py-6">
+      <div className="bg-slate-800/60 overflow-hidden shadow-xl rounded-2xl md:rounded-xl border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300 flex flex-col h-full">
+        <div className="px-3 md:px-6 py-4 md:py-6 flex-grow">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-gradient-to-r from-purple-400 to-purple-600 rounded-xl p-3 shadow-lg shadow-purple-500/20">
               <TbCalendarStats className="h-8 w-8 text-white" />
@@ -128,12 +128,12 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
             </div>
           </div>
         </div>
-        <div className="bg-slate-700/30 px-6 py-3">
+        <div className="bg-slate-700/30 px-6 py-3 mt-auto">
           <div className="text-sm">
-            <button className=" text-primary-400 hover:text-primary-300 flex items-center">
+            <Link to="/financial-sources" className="text-primary-400 hover:text-primary-300 flex items-center">
               Update balances
               <TbChevronRight className="ml-1 h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

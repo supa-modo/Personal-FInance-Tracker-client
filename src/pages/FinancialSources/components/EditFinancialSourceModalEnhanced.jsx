@@ -44,6 +44,7 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onSubmit, source })
         id: source.id,
         name: source.name,
         type: source.type,
+        institution: source.institution,
         description: source.description || '',
         colorCode: source.colorCode,
         isActive: source.isActive
@@ -103,6 +104,10 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onSubmit, source })
     
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
+    }
+    
+    if (!formData.institution.trim()) {
+      newErrors.institution = 'Institution is required';
     }
     
     if (!formData.type) {
@@ -187,6 +192,34 @@ const EditFinancialSourceModalEnhanced = ({ isOpen, onClose, onSubmit, source })
               </div>
               {errors.name && (
                 <p className="mt-1 text-sm text-red-400">{errors.name}</p>
+              )}
+            </div>
+
+            {/* Institution field */}
+            <div>
+              <label htmlFor="institution" className="block text-sm font-medium text-primary-500">
+                Institution
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  type="text"
+                  name="institution"
+                  id="institution"
+                  value={formData.institution}
+                  onChange={handleChange}
+                  className={`block w-full px-3 py-2.5 border ${
+                    errors.institution ? 'border-red-500' : 'border-slate-600'
+                  } bg-slate-800/50 text-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400`}
+                  placeholder="e.g., Savings Account"
+                />
+                {errors.institution && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <TbAlertCircle className="h-5 w-5 text-red-400" />
+                  </div>
+                )}
+              </div>
+              {errors.institution && (
+                <p className="mt-1 text-sm text-red-400">{errors.institution}</p>
               )}
             </div>
             

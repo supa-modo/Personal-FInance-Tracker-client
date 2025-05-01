@@ -18,6 +18,7 @@ export const getFinancialSources = async () => {
         id: source.id,
         name: source.name,
         type: source.type,
+        institution: source.institution,
         description: source.description,
         colorCode: source.color_code,
         isActive: source.is_active,
@@ -58,6 +59,7 @@ export const getFinancialSourceById = async (id) => {
         id: source.id,
         name: source.name,
         type: source.type,
+        institution: source.institution,
         description: source.description,
         colorCode: source.color_code,
         isActive: source.is_active,
@@ -91,6 +93,7 @@ export const createFinancialSource = async (sourceData) => {
     const backendSourceData = {
       name: sourceData.name,
       type: sourceData.type,
+      institution: source.institution,
       description: sourceData.description,
       color_code: sourceData.colorCode || '#3B82F6', // Default to blue if not set
       is_active: sourceData.isActive !== undefined ? sourceData.isActive : true
@@ -108,6 +111,7 @@ export const createFinancialSource = async (sourceData) => {
         id: source.id,
         name: source.name,
         type: source.type,
+        institution: source.institution,
         description: source.description,
         colorCode: source.color_code,
         isActive: source.is_active,
@@ -137,6 +141,7 @@ export const updateFinancialSource = async (id, updates) => {
     
     if (updates.name) backendSourceData.name = updates.name;
     if (updates.type) backendSourceData.type = updates.type;
+    if (updates.institution) backendSourceData.institution = updates.institution;
     if (updates.description) backendSourceData.description = updates.description;
     if (updates.colorCode) backendSourceData.color_code = updates.colorCode;
     if (updates.isActive !== undefined) backendSourceData.is_active = updates.isActive;
@@ -150,6 +155,7 @@ export const updateFinancialSource = async (id, updates) => {
         id: source.id,
         name: source.name,
         type: source.type,
+        institution: source.institution,
         description: source.description,
         colorCode: source.color_code,
         isActive: source.is_active,
@@ -233,6 +239,7 @@ export const addBalanceUpdate = async (sourceId, update) => {
             id: source.id,
             name: source.name,
             type: source.type,
+            institution: source.institution,
             description: source.description,
             colorCode: source.color_code,
             isActive: source.is_active,
@@ -361,6 +368,7 @@ export const getHistoricalNetWorth = async (period = 'month') => {
                   id: source.id,
                   name: source.name,
                   type: source.type,
+                  institution: source.institution,
                   colorCode: source.color_code,
                   balance: parseFloat(source.balance || 0)
                 }
@@ -386,77 +394,109 @@ export const getHistoricalNetWorth = async (period = 'month') => {
     if (useLocalCalculation) {
       // Fallback to local calculation if API fails
       const sources = await getFinancialSources();
+      const activeSources = sources.filter(source => source.isActive);
     
       // Determine the start date based on the period
       const now = new Date();
       let startDate;
+      let numDataPoints = 7; // Default number of data points to show
       
       switch (period) {
         case 'week':
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+          numDataPoints = 7; // Daily for a week
           break;
         case 'month':
           startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          numDataPoints = 30; // Daily for a month
           break;
         case 'quarter':
           startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+          numDataPoints = 12; // Weekly for a quarter
           break;
         case 'year':
           startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+          numDataPoints = 12; // Monthly for a year
           break;
         default:
           startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          numDataPoints = 30;
       }
       
+      console.log(`Calculating historical net worth from ${startDate.toISOString()} to ${now.toISOString()}`);
+      
       // Get all updates from all active sources
-      const allUpdates = sources
-        .filter(source => source.isActive)
+      const allUpdates = activeSources
         .flatMap(source => (source.updates || []).map(update => ({
           ...update,
           sourceId: source.id,
           sourceName: source.name,
           sourceType: source.type,
+          institution: source.institution,
           sourceColorCode: source.colorCode,
+          date: new Date(update.createdAt)
         })))
-        .filter(update => new Date(update.createdAt) >= startDate)
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        .filter(update => update.date >= startDate)
+        .sort((a, b) => a.date - b.date);
       
-      // Group updates by date
-      const dateMap = new Map();
+      // Create a map of source ID to its latest balance at any given time
+      const sourceLatestBalances = new Map();
       
-      allUpdates.forEach(update => {
-        const date = new Date(update.createdAt).toISOString().split('T')[0];
-        
-        if (!dateMap.has(date)) {
-          dateMap.set(date, {
-            date,
-            netWorth: 0,
-            sources: {},
-          });
+      // Generate dates between start date and now
+      const dateList = [];
+      const interval = Math.max(1, Math.floor((now - startDate) / (numDataPoints - 1)));
+      
+      for (let i = 0; i < numDataPoints; i++) {
+        const date = new Date(startDate.getTime() + (interval * i));
+        if (date <= now) {
+          dateList.push(date);
         }
+      }
+      
+      // Make sure we include today
+      if (dateList[dateList.length - 1].toDateString() !== now.toDateString()) {
+        dateList.push(now);
+      }
+      
+      // Generate historical data points
+      const historicalData = [];
+      
+      dateList.forEach(date => {
+        // Find all updates up to this date
+        const updatesUpToDate = allUpdates.filter(update => update.date <= date);
         
-        const dateData = dateMap.get(date);
+        // Update the latest balance for each source
+        updatesUpToDate.forEach(update => {
+          sourceLatestBalances.set(update.sourceId, {
+            id: update.sourceId,
+            name: update.sourceName,
+            type: update.sourceType,
+            institution: update.institution,
+            colorCode: update.sourceColorCode,
+            balance: parseFloat(update.balance)
+          });
+        });
         
-        // Update the source balance for this date
-        dateData.sources[update.sourceId] = {
-          id: update.sourceId,
-          name: update.sourceName,
-          type: update.sourceType,
-          colorCode: update.sourceColorCode,
-          balance: update.balance
-        };
+        // Calculate net worth for this date using the latest balances
+        const netWorth = Array.from(sourceLatestBalances.values())
+          .reduce((total, source) => total + source.balance, 0);
+        
+        // Format the date string
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Add to historical data
+        historicalData.push({
+          date: dateStr,
+          netWorth: netWorth,
+          total: netWorth, // For backward compatibility
+          sources: Object.fromEntries(sourceLatestBalances.entries())
+        });
       });
       
-      // Calculate net worth for each date based on the latest balance for each source
-      const historicalData = Array.from(dateMap.values()).map(dateData => {
-        // Calculate net worth for this date
-        dateData.netWorth = Object.values(dateData.sources).reduce(
-          (total, source) => total + source.balance,
-          0
-        );
-        
-        return dateData;
-      });
+      console.log(`Generated ${historicalData.length} historical data points`);
+      
+      // Sort by date (oldest to newest)
+      historicalData.sort((a, b) => new Date(a.date) - new Date(b.date));
       
       return historicalData;
     } // Close the if(useLocalCalculation) block

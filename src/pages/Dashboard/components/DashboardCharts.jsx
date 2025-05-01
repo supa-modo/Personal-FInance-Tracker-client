@@ -64,8 +64,8 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#94a3b8', fontSize: 12 }}
-                  tickFormatter={(value) => formatCurrency(value, 'KES', 0)}
-                />
+                  tickFormatter={(value) => formatCurrency(value, { notation: 'compact' })}
+                  />
                 <Tooltip 
                   formatter={(value) => formatCurrency(value)}
                   contentStyle={{ 
@@ -73,7 +73,8 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
                     border: '1px solid rgba(100, 116, 139, 0.2)',
-                    color: '#e2e8f0'
+                    color: '#e2e8f0',
+                    fontSize: 12,
                   }}
                 />
                 <Area 
@@ -137,7 +138,8 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
                     border: '1px solid rgba(100, 116, 139, 0.2)',
-                    color: '#e2e8f0'
+                    color: '#e2e8f0',
+                    fontSize: 12,
                   }}
                 />
               </PieChart>

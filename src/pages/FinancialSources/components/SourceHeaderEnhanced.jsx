@@ -44,8 +44,8 @@ const SourceHeaderEnhanced = ({
                 <h1 className="text-lg md:text-2xl font-bold text-white">
                   {source?.name}
                 </h1>
-                <p className="mt-1 text-sm text-slate-400">
-                  {source?.description || 'No description'}
+                <p className="mt-1 text-sm text-slate-400 truncate">
+                  {source.institution || "Institution"} - {source?.description || 'No description'}
                 </p>
               </div>
             </div>

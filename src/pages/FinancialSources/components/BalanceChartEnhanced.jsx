@@ -146,13 +146,13 @@ const BalanceChartEnhanced = ({ chartData, sourceColor }) => {
                   }}
                   stroke="#94a3b8"
                   tick={{ fill: '#94a3b8' }}
-                  fontSize={13}
+                  fontSize={12}
                 />
                 <YAxis 
                   tickFormatter={(value) => formatCurrency(value, { notation: 'compact' })}
                   stroke="#94a3b8"
                   tick={{ fill: '#94a3b8' }}
-                  fontSize={12}
+                  fontSize={11}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line 

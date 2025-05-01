@@ -39,4 +39,7 @@
   --color-primary-700: oklch(0.53 0.12 118.34);
   --color-primary-800: oklch(0.53 0.12 118.34);
   --color-primary-900: oklch(0.53 0.12 118.34);
+
+  --font-lexend: "Lexend", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
 }
