@@ -76,15 +76,23 @@ const FinancialSourcesList = () => {
     }
   };
   
-  const handleAddSource = (newSource) => {
-    addFinancialSource(newSource);
-    setIsAddModalOpen(false);
+  const handleAddSource = async (newSource) => {
+    try {
+      await addFinancialSource(newSource);
+      // Modal will be closed by the AddFinancialSourceModalEnhanced component after successful add
+    } catch (error) {
+      console.error('Error adding financial source:', error);
+    }
   };
   
-  const handleEditSource = (updatedSource) => {
-    updateFinancialSource(updatedSource);
-    setIsEditModalOpen(false);
-    setSourceToEdit(null);
+  const handleEditSource = async (updatedSource) => {
+    try {
+      await updateFinancialSource(updatedSource);
+      setIsEditModalOpen(false);
+      setSourceToEdit(null);
+    } catch (error) {
+      console.error('Error updating financial source:', error);
+    }
   };
   
   const handleEditClick = (source) => {

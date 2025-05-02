@@ -9,10 +9,12 @@ import {
   TbTrendingUp,
   TbCreditCard,
   TbWallet,
-  TbCurrencyDollar
+  TbCurrencyDollar,
+  TbLoader
 } from 'react-icons/tb';
 
 const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     type: 'BANK_ACCOUNT',
@@ -78,8 +80,8 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
       newErrors.name = 'Name is required';
     }
 
-    if (!formData.instituiton.trim()) {
-      newErrors.instituiton = 'Institution is required';
+    if (!formData.institution?.trim()) {
+      newErrors.institution = 'Institution is required';
     }
     
     if (!formData.type) {
@@ -90,29 +92,37 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
     return Object.keys(newErrors).length === 0;
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // Ensure colorCode is set - use default blue if null
-      const dataToSubmit = {
-        ...formData,
-        colorCode: formData.colorCode || '#3B82F6' // Default to blue if not set
-      };
-      
-      // Pass the data to the parent component
-      onAdd(dataToSubmit);
-      
-      // Reset form
-      setFormData({
-        name: '',
-        type: 'BANK_ACCOUNT',
-        institution: '',
-        description: '',
-        colorCode: '##3B82F6',
-        isActive: true
-      });
-      setErrors({});
+      setLoading(true);
+      try {
+        // Ensure colorCode is set - use default blue if null
+        const dataToSubmit = {
+          ...formData,
+          colorCode: formData.colorCode || '#3B82F6' // Default to blue if not set
+        };
+        
+        // Pass the data to the parent component
+        await onAdd(dataToSubmit);
+        
+        // Reset form
+        setFormData({
+          name: '',
+          type: 'BANK_ACCOUNT',
+          institution: '',
+          description: '',
+          colorCode: '#3B82F6',
+          isActive: true
+        });
+        setErrors({});
+        onClose();
+      } catch (error) {
+        console.error('Error adding financial source:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
   
@@ -186,7 +196,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
 
              {/* Institution field */}
              <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-300">
+              <label htmlFor="institution" className="block text-sm font-medium text-slate-300">
                 Institution
               </label>
               <div className="mt-1 relative">
@@ -257,26 +267,6 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
               </div>
             </div>
             
-            {/* Color selection */}
-            {/* <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Color
-              </label>
-              <div className="grid grid-cols-6 gap-2">
-                {colorOptions.map(color => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`h-8 w-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 ${
-                      formData.colorCode === color ? 'ring-2 ring-white' : ''
-                    }`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => handleColorSelect(color)}
-                  />
-                ))}
-              </div>
-            </div> */}
-            
             {/* Active toggle */}
             <div className="flex items-center">
               <button
@@ -297,19 +287,28 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
               </span>
             </div>
             
-            <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 pt-3 border-t border-slate-700/50">
+            <div className="flex justify-end space-x-3 mt-6">
               <button
                 type="button"
-                className="inline-flex justify-center w-full rounded-xl border border-slate-600 px-4 py-2.5 bg-slate-700/50 text-base font-medium text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 sm:text-sm transition-all duration-200"
                 onClick={onClose}
+                disabled={loading}
+                className="inline-flex justify-center px-4 py-2 text-sm font-medium text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all duration-200"
+                disabled={loading}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Add Source
+                {loading ? (
+                  <>
+                    <TbLoader className="animate-spin mr-2 h-4 w-4" />
+                    Adding...
+                  </>
+                ) : (
+                  'Add Source'
+                )}
               </button>
             </div>
           </form>

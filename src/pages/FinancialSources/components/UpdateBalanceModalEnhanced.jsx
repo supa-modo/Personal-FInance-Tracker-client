@@ -6,11 +6,13 @@ import {
   TbArrowUpRight,
   TbArrowDownRight,
   TbChartPie,
-  TbRefresh
+  TbRefresh,
+  TbLoader
 } from 'react-icons/tb';
 import { formatCurrency } from '../../../utils/formatters';
 
 const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onSubmit, source, currentBalance }) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     balance: '',
     notes: '',
@@ -101,25 +103,32 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onSubmit, source, current
     return Object.keys(newErrors).length === 0;
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit({
-        balance: parseFloat(formData.balance),
-        notes: formData.notes.trim(),
-        sourceId: source?.id
-      });
-      
-      // Reset form
-      setFormData({
-        balance: '',
-        notes: '',
-      });
-      setErrors({});
-      
-      // Close the modal
-      onClose();
+      setLoading(true);
+      try {
+        await onSubmit({
+          balance: parseFloat(formData.balance),
+          notes: formData.notes.trim(),
+          sourceId: source?.id
+        });
+        
+        // Reset form
+        setFormData({
+          balance: '',
+          notes: '',
+        });
+        setErrors({});
+        
+        // Close the modal only after successful update
+        onClose();
+      } catch (error) {
+        console.error('Error updating balance:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
   
@@ -245,18 +254,29 @@ const UpdateBalanceModalEnhanced = ({ isOpen, onClose, onSubmit, source, current
             <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 pt-3 border-t border-slate-700/50">
               <button
                 type="button"
-                className="inline-flex justify-center w-full rounded-xl border border-slate-600 px-4 py-2.5 bg-slate-700/50 text-base font-medium text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 sm:text-sm transition-all duration-200"
+                className="inline-flex justify-center w-full rounded-xl border border-slate-600 px-4 py-2.5 bg-slate-700/50 text-base font-medium text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 sm:text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={onClose}
+                disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all duration-200"
+                disabled={loading}
+                className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <div className='flex items-center'>
-                  <TbRefresh className="h-5 w-5 mr-2" />
-                  <span>Update Balance</span>
+                  {loading ? (
+                    <>
+                      <TbLoader className="animate-spin h-5 w-5 mr-2" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <TbRefresh className="h-5 w-5 mr-2" />
+                      <span>Update Balance</span>
+                    </>
+                  )}
                 </div>
               </button>
             </div>

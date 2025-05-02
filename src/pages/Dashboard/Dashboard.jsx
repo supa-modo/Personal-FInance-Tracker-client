@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import useFinancial from '../../hooks/useFinancial';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -22,7 +22,8 @@ import {
   TbTrendingUp,
   TbCreditCard,
   TbWallet,
-  TbCurrencyDollar
+  TbCurrencyDollar,
+  TbRefresh
 } from 'react-icons/tb';
 import { PiMoneyWavyDuotone } from 'react-icons/pi';
 
@@ -34,13 +35,15 @@ const Dashboard = () => {
     netWorth,
     historicalData,
     getNetWorth,
-    getHistoricalNetWorth
+    getHistoricalNetWorth,
+    loadFinancialSources
   } = useFinancial();
   
   const [timePeriod, setTimePeriod] = useState('month');
   const [activeTab, setActiveTab] = useState('overview');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
-  // Load dashboard data only once when component mounts or when timePeriod changes
+  // Load dashboard data when component mounts or when timePeriod changes
   useEffect(() => {
     const loadData = async () => {
       if (!loading) {
@@ -60,6 +63,25 @@ const Dashboard = () => {
     // Only depend on loading and timePeriod to prevent infinite loops
     // getNetWorth and getHistoricalNetWorth are function references that shouldn't change
   }, [loading, timePeriod]);
+  
+  // Function to refresh all dashboard data
+  const refreshDashboardData = async () => {
+    setIsRefreshing(true);
+    try {
+      // Reload all financial sources
+      await loadFinancialSources();
+      
+      // Reload net worth data
+      await getNetWorth();
+      
+      // Reload historical data
+      await getHistoricalNetWorth(timePeriod);
+    } catch (error) {
+      console.error('Error refreshing dashboard data:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   
   // Get active financial sources
   const activeSources = financialSources.filter(source => source.isActive);
@@ -106,10 +128,27 @@ const Dashboard = () => {
   }));
   
   // Prepare data for line chart
-  const lineChartData = Array.isArray(historicalData) ? historicalData.map(item => ({
-    date: formatDate(item.date, { month: 'short', day: 'numeric' }),
-    total: item.netWorth || item.total || 0,
-  })) : [];
+  const lineChartData = useMemo(() => {
+    if (!Array.isArray(historicalData) || historicalData.length === 0) {
+      console.log('No historical data available');
+      return [];
+    }
+    
+    // Make a deep copy of the data to avoid modifying the original
+    const processedData = historicalData.map(item => ({
+      date: formatDate(new Date(item.date), { month: 'short', day: 'numeric' }),
+      total: typeof item.netWorth === 'number' ? item.netWorth : 
+             typeof item.total === 'number' ? item.total : 
+             parseFloat(item.netWorth || item.total || 0),
+      rawDate: item.date, // Keep the raw date for sorting
+    }));
+    
+    // Sort by date (oldest to newest)
+    const sortedData = processedData.sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
+    
+    console.log('Processed line chart data:', sortedData);
+    return sortedData;
+  }, [historicalData]);
   
   // Calculate change from previous period
   const calculateChange = () => {
@@ -117,12 +156,26 @@ const Dashboard = () => {
       return { amount: 0, percentage: 0, isPositive: true };
     }
     
-    const currentTotal = historicalData[historicalData.length - 1]?.netWorth || 
-                        historicalData[historicalData.length - 1]?.total || 0;
-    const previousTotal = historicalData[0]?.netWorth || historicalData[0]?.total || 0;
+    // Sort data by date to ensure correct order
+    const sortedData = [...historicalData].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // Get first and last data points after sorting
+    const firstDataPoint = sortedData[0];
+    const lastDataPoint = sortedData[sortedData.length - 1];
+    
+    // Extract values, ensuring they are numbers
+    const currentTotal = typeof lastDataPoint.netWorth === 'number' ? lastDataPoint.netWorth : 
+                         typeof lastDataPoint.total === 'number' ? lastDataPoint.total : 
+                         parseFloat(lastDataPoint.netWorth || lastDataPoint.total || 0);
+                         
+    const previousTotal = typeof firstDataPoint.netWorth === 'number' ? firstDataPoint.netWorth : 
+                          typeof firstDataPoint.total === 'number' ? firstDataPoint.total : 
+                          parseFloat(firstDataPoint.netWorth || firstDataPoint.total || 0);
     
     const change = currentTotal - previousTotal;
     const percentage = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;
+    
+    console.log('Change calculation:', { currentTotal, previousTotal, change, percentage });
     
     return {
       amount: change,
@@ -179,10 +232,20 @@ const Dashboard = () => {
   
   return (
     <MainLayout>
-      <DashboardHeader 
-        timePeriod={timePeriod} 
-        setTimePeriod={setTimePeriod} 
-      />
+      <div className="flex justify-between items-center mb-6">
+        <DashboardHeader 
+          timePeriod={timePeriod} 
+          setTimePeriod={setTimePeriod} 
+        />
+        <button 
+          onClick={refreshDashboardData}
+          disabled={isRefreshing}
+          className="flex items-center justify-center p-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+          title="Refresh dashboard data"
+        >
+          <TbRefresh className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
       
       <DashboardTabs 
         activeTab={activeTab} 

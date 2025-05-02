@@ -68,12 +68,16 @@ const FinancialSourceDetail = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleEditSource = (updatedSource) => {
-    // Make sure we're passing the ID and the updated source data separately
-    updateFinancialSource(source.id, updatedSource);
-    setIsEditModalOpen(false);
-    // Update the local source state to reflect changes immediately
-    setSource((prev) => ({ ...prev, ...updatedSource }));
+  const handleEditSource = async (updatedSource) => {
+    try {
+      // Make sure we're passing the ID and the updated source data separately
+      await updateFinancialSource(source.id, updatedSource);
+      setIsEditModalOpen(false);
+      // Update the local source state to reflect changes immediately
+      setSource((prev) => ({ ...prev, ...updatedSource }));
+    } catch (error) {
+      console.error("Error updating financial source:", error);
+    }
   };
 
   // Handle update modal open
@@ -104,27 +108,33 @@ const FinancialSourceDetail = () => {
   };
 
   // Handle form submission - now receives data from the modal component
-  const handleUpdateSubmit = (formData) => {
-    // Format today's date in YYYY-MM-DD format
-    const today = new Date();
-    const formattedDate =
-      today.getFullYear() +
-      "-" +
-      String(today.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(today.getDate()).padStart(2, "0");
+  const handleUpdateSubmit = async (formData) => {
+    try {
+      // Format today's date in YYYY-MM-DD format
+      const today = new Date();
+      const formattedDate =
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0");
 
-    // Add balance update using the data from the modal
-    addBalanceUpdate(source.id, {
-      balance: parseFloat(formData.balance),
-      notes: formData.notes,
-      date: formattedDate, // Use the formatted date in YYYY-MM-DD format
-    });
+      // Add balance update using the data from the modal
+      await addBalanceUpdate(source.id, {
+        balance: parseFloat(formData.balance),
+        notes: formData.notes,
+        date: formattedDate, // Use the formatted date in YYYY-MM-DD format
+      });
 
-    // Close modal and reset form
-    setIsUpdateModalOpen(false);
-    setUpdateForm({ balance: "", notes: "" });
-    setUpdateErrors({});
+      // Reset form (modal will be closed by the UpdateBalanceModalEnhanced component)
+      setUpdateForm({ balance: "", notes: "" });
+      setUpdateErrors({});
+      
+      return true; // Indicate success to the modal component
+    } catch (error) {
+      console.error("Error updating balance:", error);
+      return false; // Indicate failure to the modal component
+    }
   };
 
   if (loading) {

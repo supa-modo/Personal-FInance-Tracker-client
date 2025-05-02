@@ -28,39 +28,72 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
   const [timeRange, setTimeRange] = useState('6m'); // 1m, 3m, 6m, 1y, all
   const [comparisonMode, setComparisonMode] = useState('none'); // none, mom, yoy
 
-  // Generate mock historical data if not provided
-  const getHistoricalData = () => {
-    if (historicalData && historicalData.length > 0) {
-      return historicalData;
+  // Process historical data and ensure it's properly formatted
+  const getHistoricalData = useMemo(() => {
+    console.log('TrendsTab - Raw historical data:', historicalData);
+    
+    if (!historicalData || !Array.isArray(historicalData) || historicalData.length === 0) {
+      console.log('TrendsTab - No historical data available');
+      return [];
     }
-
-    return [];
-  };
+    
+    // Ensure all data points have netWorth property and are properly formatted
+    const processedData = historicalData.map(item => ({
+      ...item,
+      date: item.date, // Keep the original date string
+      // Ensure netWorth is a number
+      netWorth: typeof item.netWorth === 'number' ? item.netWorth : 
+               typeof item.total === 'number' ? item.total : 
+               parseFloat(item.netWorth || item.total || 0)
+    }));
+    
+    // Sort by date (oldest to newest)
+    const sortedData = processedData.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    console.log('TrendsTab - Processed historical data:', sortedData);
+    return sortedData;
+  }, [historicalData]);
 
   // Prepare data for charts
   const chartData = useMemo(() => {
-    const data = getHistoricalData();
+    // Use the result of the getHistoricalData useMemo
+    if (!getHistoricalData || getHistoricalData.length === 0) {
+      console.log('TrendsTab - No data available for chart');
+      return [];
+    }
+    
+    const data = getHistoricalData;
     
     // Filter data based on selected time range
     const filteredData = data.filter(item => {
-      const itemDate = new Date(item.date);
-      const today = new Date();
-      const monthsAgo = new Date(today);
-      
-      if (timeRange === '1m') {
-        monthsAgo.setMonth(today.getMonth() - 1);
-      } else if (timeRange === '3m') {
-        monthsAgo.setMonth(today.getMonth() - 3);
-      } else if (timeRange === '6m') {
-        monthsAgo.setMonth(today.getMonth() - 6);
-      } else if (timeRange === '1y') {
-        monthsAgo.setMonth(today.getMonth() - 12);
-      } else {
-        // 'all' - no filtering
-        return true;
+      try {
+        const itemDate = new Date(item.date);
+        if (isNaN(itemDate.getTime())) {
+          console.log('TrendsTab - Invalid date:', item.date);
+          return false;
+        }
+        
+        const today = new Date();
+        const monthsAgo = new Date(today);
+        
+        if (timeRange === '1m') {
+          monthsAgo.setMonth(today.getMonth() - 1);
+        } else if (timeRange === '3m') {
+          monthsAgo.setMonth(today.getMonth() - 3);
+        } else if (timeRange === '6m') {
+          monthsAgo.setMonth(today.getMonth() - 6);
+        } else if (timeRange === '1y') {
+          monthsAgo.setMonth(today.getMonth() - 12);
+        } else {
+          // 'all' - no filtering
+          return true;
+        }
+        
+        return itemDate >= monthsAgo;
+      } catch (error) {
+        console.error('TrendsTab - Error filtering data:', error);
+        return false;
       }
-      
-      return itemDate >= monthsAgo;
     });
     
     // Calculate period-over-period changes if comparison mode is enabled
@@ -91,7 +124,17 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
 
   // Calculate key metrics
   const metrics = useMemo(() => {
-    if (chartData.length < 2) {
+    if (!chartData || chartData.length < 2) {
+      // If we have at least one data point, use it for current net worth
+      if (chartData && chartData.length === 1) {
+        return {
+          currentNetWorth: parseFloat(chartData[0].netWorth || 0),
+          changeAmount: 0,
+          changePercentage: 0,
+          trend: 'neutral'
+        };
+      }
+      
       return {
         currentNetWorth: 0,
         changeAmount: 0,
@@ -100,11 +143,17 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
       };
     }
     
-    const current = chartData[chartData.length - 1].netWorth;
-    const first = chartData[0].netWorth;
+    // Sort data by date to ensure correct order
+    const sortedData = [...chartData].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // Get the first and last values after sorting
+    const current = parseFloat(sortedData[sortedData.length - 1].netWorth || 0);
+    const first = parseFloat(sortedData[0].netWorth || 0);
     const changeAmount = current - first;
     // Store as decimal for consistent handling
     const changePercentage = first !== 0 ? changeAmount / first : 0;
+    
+    console.log('TrendsTab Metrics:', { current, first, changeAmount, changePercentage });
     
     return {
       currentNetWorth: current,
@@ -116,10 +165,13 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
 
   // Calculate growth rate (CAGR)
   const growthRate = useMemo(() => {
-    if (chartData.length < 2) return 0;
+    if (!chartData || chartData.length < 2) return 0;
     
-    const firstValue = chartData[0].netWorth;
-    const lastValue = chartData[chartData.length - 1].netWorth;
+    // Sort data by date to ensure correct order
+    const sortedData = [...chartData].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    const firstValue = parseFloat(sortedData[0].netWorth || 0);
+    const lastValue = parseFloat(sortedData[sortedData.length - 1].netWorth || 0);
     const years = timeRange === '1m' ? 1/12 : 
                  timeRange === '3m' ? 3/12 : 
                  timeRange === '6m' ? 6/12 : 
@@ -127,27 +179,40 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
     
     // CAGR formula: (FV/PV)^(1/n) - 1
     // Store as decimal for consistent handling
-    return firstValue > 0 ? Math.pow(lastValue / firstValue, 1 / years) - 1 : 0;
+    const rate = firstValue > 0 ? Math.pow(lastValue / firstValue, 1 / years) - 1 : 0;
+    
+    console.log('Growth Rate Calculation:', { firstValue, lastValue, years, rate });
+    
+    return rate;
   }, [chartData, timeRange]);
 
   // Custom tooltip for charts
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
-      return (
-        <div className="bg-slate-800 py-1.5 px-2 md:py-2 md:px-3 text-[0.8rem] md:text-[0.85rem] border border-slate-700 rounded-lg shadow-lg">
-          <p className="text-slate-300  font-medium">{new Date(label).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
-          {payload.map((entry, index) => (
-            <p key={index} style={{ color: entry.color || entry.stroke }}>
-              {entry.name}: {formatCurrency(entry.value)}
+      try {
+        return (
+          <div className="bg-slate-800 py-1.5 px-2 md:py-2 md:px-3 text-[0.8rem] md:text-[0.85rem] border border-slate-700 rounded-lg shadow-lg">
+            <p className="text-slate-300 font-medium">
+              {typeof label === 'string' ? 
+                new Date(label).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 
+                label}
             </p>
-          ))}
-          {comparisonMode !== 'none' && payload[0].payload.changePercentage && (
-            <p className={payload[0].payload.changePercentage >= 0 ? 'text-green-400' : 'text-red-400'}>
-              Change: {(payload[0].payload.changePercentage * 100).toFixed(2)}%
-            </p>
-          )}
-        </div>
-      );
+            {payload.map((entry, index) => (
+              <p key={index} style={{ color: entry.color || entry.stroke }}>
+                {entry.name}: {formatCurrency(entry.value)}
+              </p>
+            ))}
+            {comparisonMode !== 'none' && payload[0].payload.changePercentage && (
+              <p className={payload[0].payload.changePercentage >= 0 ? 'text-green-400' : 'text-red-400'}>
+                Change: {(payload[0].payload.changePercentage * 100).toFixed(2)}%
+              </p>
+            )}
+          </div>
+        );
+      } catch (error) {
+        console.error('Error rendering tooltip:', error);
+        return null;
+      }
     }
     return null;
   };
@@ -268,7 +333,13 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
                timeRange === '1y' ? 'Last Year' : 'All Time'}
             </div>
             <div className="text-[0.8rem] md:text-sm font-lexend text-slate-400 mt-1">
-              {chartData.length > 0 ? `${new Date(chartData[0].date).toLocaleDateString()} - ${new Date(chartData[chartData.length - 1].date).toLocaleDateString()}` : 'No data available'}
+              {chartData && chartData.length > 0 ? (() => {
+                // Sort data by date
+                const sortedData = [...chartData].sort((a, b) => new Date(a.date) - new Date(b.date));
+                const startDate = new Date(sortedData[0].date);
+                const endDate = new Date(sortedData[sortedData.length - 1].date);
+                return `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+              })() : 'No data available'}
             </div>
           </div>
         </div>

@@ -1,6 +1,3 @@
-// Enhanced login form component with premium styling
-// This will be integrated into the main Login.jsx file
-
 import React from "react";
 import {
   TbChevronRight,
@@ -14,6 +11,7 @@ import { FcGoogle } from "react-icons/fc";
 import { PiPasswordDuotone } from "react-icons/pi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { LuLogIn } from "react-icons/lu";
+import { motion } from "framer-motion";
 const LoginFormEnhanced = ({
   formData,
   errors,
@@ -252,8 +250,8 @@ const LoginFormEnhanced = ({
           </div>
 
           {/* Submit button */}
-          <div className="">
-            <button
+            <motion.button
+              whileTap={{scale: 0.97}}
               type="submit"
               disabled={isSubmitting}
               onClick={handleSubmit}
@@ -279,8 +277,7 @@ const LoginFormEnhanced = ({
                   </>
                 )}
               </span>
-            </button>
-          </div>
+            </motion.button>
 
          
 

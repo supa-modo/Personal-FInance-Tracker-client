@@ -218,6 +218,7 @@ export const FinancialProvider = ({ children }) => {
     updateFinancialSource,
     deleteFinancialSource,
     addBalanceUpdate,
+    loadFinancialSources,
     getNetWorth: loadNetWorth,  // Replace with function that updates state
     getHistoricalNetWorth: loadHistoricalData,  // Replace with function that updates state
     refreshData: loadFinancialSources
