@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import useFinancial from '../../hooks/useFinancial';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { getNetWorthEvents, formatNetWorthEventsForChart } from '../../services/netWorth.service';
 
 // Import component files
 import DashboardHeader from './components/DashboardHeader';
@@ -42,6 +43,8 @@ const Dashboard = () => {
   const [timePeriod, setTimePeriod] = useState('month');
   const [activeTab, setActiveTab] = useState('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [netWorthEvents, setNetWorthEvents] = useState([]);
+  const [netWorthEventsLoading, setNetWorthEventsLoading] = useState(false);
   
   // Load dashboard data when component mounts or when timePeriod changes
   useEffect(() => {
@@ -53,6 +56,9 @@ const Dashboard = () => {
           
           // Load historical data (now async)
           await getHistoricalNetWorth(timePeriod);
+          
+          // Load net worth events
+          await loadNetWorthEvents(timePeriod);
         } catch (error) {
           console.error('Error loading dashboard data:', error);
         }
@@ -63,6 +69,26 @@ const Dashboard = () => {
     // Only depend on loading and timePeriod to prevent infinite loops
     // getNetWorth and getHistoricalNetWorth are function references that shouldn't change
   }, [loading, timePeriod]);
+  
+  // Load net worth events from the API
+  const loadNetWorthEvents = async (period) => {
+    setNetWorthEventsLoading(true);
+    try {
+      // Map the dashboard time period to API period
+      const apiPeriod = period === 'week' ? 'week' : 
+                       period === 'month' ? 'month' : 
+                       period === 'quarter' ? 'quarter' : 
+                       period === 'year' ? 'year' : 'all';
+      
+      const events = await getNetWorthEvents(apiPeriod);
+      setNetWorthEvents(events);
+      console.log('Loaded net worth events:', events.length);
+    } catch (error) {
+      console.error('Error loading net worth events:', error);
+    } finally {
+      setNetWorthEventsLoading(false);
+    }
+  };
   
   // Function to refresh all dashboard data
   const refreshDashboardData = async () => {
@@ -76,6 +102,9 @@ const Dashboard = () => {
       
       // Reload historical data
       await getHistoricalNetWorth(timePeriod);
+      
+      // Reload net worth events
+      await loadNetWorthEvents(timePeriod);
     } catch (error) {
       console.error('Error refreshing dashboard data:', error);
     } finally {
@@ -127,8 +156,25 @@ const Dashboard = () => {
     color: source.colorCode,
   }));
   
-  // Prepare data for line chart
+  // Prepare data for line chart - prioritize net worth events if available
   const lineChartData = useMemo(() => {
+    // Check if we have net worth events data
+    if (Array.isArray(netWorthEvents) && netWorthEvents.length > 0) {
+      // Format net worth events for chart display
+      const formattedEvents = formatNetWorthEventsForChart(netWorthEvents);
+      
+      // Format dates for display
+      const processedData = formattedEvents.map(item => ({
+        date: formatDate(new Date(item.date), { month: 'short', day: 'numeric' }),
+        total: item.netWorth,
+        rawDate: item.date, // Keep the raw date for sorting
+      }));
+      
+      console.log('Using net worth events for chart data:', processedData.length);
+      return processedData;
+    }
+    
+    // Fall back to historical data if no events
     if (!Array.isArray(historicalData) || historicalData.length === 0) {
       console.log('No historical data available');
       return [];
@@ -146,12 +192,37 @@ const Dashboard = () => {
     // Sort by date (oldest to newest)
     const sortedData = processedData.sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
     
-    console.log('Processed line chart data:', sortedData);
+    console.log('Using historical data for chart data:', sortedData.length);
     return sortedData;
-  }, [historicalData]);
+  }, [historicalData, netWorthEvents]);
   
-  // Calculate change from previous period
+  // Calculate change from previous period - prioritize net worth events if available
   const calculateChange = () => {
+    // Check if we have net worth events data
+    if (Array.isArray(netWorthEvents) && netWorthEvents.length >= 2) {
+      // Sort events by date
+      const sortedEvents = [...netWorthEvents].sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+      
+      // Get first and last event
+      const firstEvent = sortedEvents[0];
+      const lastEvent = sortedEvents[sortedEvents.length - 1];
+      
+      // Calculate change
+      const currentTotal = parseFloat(lastEvent.net_worth);
+      const previousTotal = parseFloat(firstEvent.net_worth);
+      const change = currentTotal - previousTotal;
+      const percentage = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;
+      
+      console.log('Change calculation from events:', { currentTotal, previousTotal, change, percentage });
+      
+      return {
+        amount: change,
+        percentage,
+        isPositive: change >= 0,
+      };
+    }
+    
+    // Fall back to historical data if no events
     if (!Array.isArray(historicalData) || historicalData.length < 2) {
       return { amount: 0, percentage: 0, isPositive: true };
     }
@@ -175,7 +246,7 @@ const Dashboard = () => {
     const change = currentTotal - previousTotal;
     const percentage = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;
     
-    console.log('Change calculation:', { currentTotal, previousTotal, change, percentage });
+    console.log('Change calculation from historical data:', { currentTotal, previousTotal, change, percentage });
     
     return {
       amount: change,
@@ -291,6 +362,8 @@ const Dashboard = () => {
         <TrendsTabComponent 
           historicalData={historicalData}
           financialSources={financialSources}
+          netWorthEvents={netWorthEvents}
+          loading={netWorthEventsLoading}
         />
       )}
     </MainLayout>

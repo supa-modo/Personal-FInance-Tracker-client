@@ -5,8 +5,10 @@ import {
   TbChevronRight,
   TbArrowUpRight,
   TbArrowDownRight,
-  TbFilter
+  TbFilter,
+  TbLoader
 } from 'react-icons/tb';
+import { formatNetWorthEventsForChart } from '../../../services/netWorth.service';
 import { 
   LineChart, 
   Line, 
@@ -24,13 +26,20 @@ import {
 } from 'recharts';
 import { formatCurrency, formatPercentage } from '../../../utils/formatters';
 
-const TrendsTabComponent = ({ historicalData, financialSources }) => {
+const TrendsTabComponent = ({ historicalData, financialSources, netWorthEvents, loading = false }) => {
   const [timeRange, setTimeRange] = useState('6m'); // 1m, 3m, 6m, 1y, all
   const [comparisonMode, setComparisonMode] = useState('none'); // none, mom, yoy
 
-  // Process historical data and ensure it's properly formatted
+  // Process historical data - prioritize net worth events if available
   const getHistoricalData = useMemo(() => {
-    console.log('TrendsTab - Raw historical data:', historicalData);
+    // Check if we have net worth events data
+    if (Array.isArray(netWorthEvents) && netWorthEvents.length > 0) {
+      console.log('TrendsTab - Using net worth events:', netWorthEvents.length);
+      return formatNetWorthEventsForChart(netWorthEvents);
+    }
+    
+    // Fall back to historical data
+    console.log('TrendsTab - Using historical data:', historicalData?.length || 0);
     
     if (!historicalData || !Array.isArray(historicalData) || historicalData.length === 0) {
       console.log('TrendsTab - No historical data available');
@@ -50,9 +59,8 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
     // Sort by date (oldest to newest)
     const sortedData = processedData.sort((a, b) => new Date(a.date) - new Date(b.date));
     
-    console.log('TrendsTab - Processed historical data:', sortedData);
     return sortedData;
-  }, [historicalData]);
+  }, [historicalData, netWorthEvents]);
 
   // Prepare data for charts
   const chartData = useMemo(() => {
@@ -222,7 +230,10 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mx-2 md:mx-0 space-y-4 md:space-y-0">
         <div>
-          <h2 className="text-xl font-bold text-white">Net Worth Trends</h2>
+          <div className="flex items-center">
+            <h2 className="text-xl md:text-2xl font-bold text-white">Net Worth Trends</h2>
+            {loading && <TbLoader className="ml-3 animate-spin h-5 w-5 text-primary-500" />}
+          </div>
           <p className="text-slate-400 text-sm">Track your financial progress over time</p>
         </div>
         
@@ -231,24 +242,28 @@ const TrendsTabComponent = ({ historicalData, financialSources }) => {
             <button
               onClick={() => setTimeRange('1m')}
               className={`px-3 py-2 text-[0.8rem] md:text-sm ${timeRange === '1m' ? 'bg-primary-500 text-white' : 'text-slate-400 hover:text-white'}`}
+              disabled={loading}
             >
               1M
             </button>
             <button
               onClick={() => setTimeRange('3m')}
               className={`px-3 py-2 text-[0.8rem] md:text-sm  ${timeRange === '3m' ? 'bg-primary-500 text-white' : 'text-slate-400 hover:text-white'}`}
+              disabled={loading}
             >
               3M
             </button>
             <button
               onClick={() => setTimeRange('6m')}
               className={`px-3 py-2 text-[0.8rem] md:text-sm  ${timeRange === '6m' ? 'bg-primary-500 text-white' : 'text-slate-400 hover:text-white'}`}
+              disabled={loading}
             >
               6M
             </button>
             <button
               onClick={() => setTimeRange('1y')}
               className={`px-3 py-2 text-[0.8rem] md:text-sm  ${timeRange === '1y' ? 'bg-primary-500 text-white' : 'text-slate-400 hover:text-white'}`}
+              disabled={loading}
             >
               1Y
             </button>
