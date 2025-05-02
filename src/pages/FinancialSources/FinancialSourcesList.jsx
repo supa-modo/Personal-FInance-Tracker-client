@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TbCurrencyDollar,
   TbWallet,
@@ -21,6 +21,7 @@ import AddFinancialSourceModalEnhanced from "./components/AddFinancialSourceModa
 import DeleteModalEnhanced from "./components/DeleteModalEnhanced";
 import EditFinancialSourceModalEnhanced from "./components/EditFinancialSourceModalEnhanced";
 import SourcesHeader from "./components/SourcesHeader";
+import ReportsComponent from "../Dashboard/components/ReportsComponent";
 import { PiMoneyWavyDuotone } from "react-icons/pi";
 
 const FinancialSourcesList = () => {
@@ -31,7 +32,11 @@ const FinancialSourcesList = () => {
     deleteFinancialSource,
     addFinancialSource,
     updateFinancialSource,
+    getHistoricalNetWorthData,
   } = useFinancial();
+  
+  const [historicalData, setHistoricalData] = useState([]);
+  const [historicalDataLoading, setHistoricalDataLoading] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("");
@@ -42,6 +47,25 @@ const FinancialSourcesList = () => {
   const [sourceToDelete, setSourceToDelete] = useState(null);
   const [sourceToEdit, setSourceToEdit] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Fetch historical data for reports
+  useEffect(() => {
+    const fetchHistoricalData = async () => {
+      if (financialSources.length > 0) {
+        setHistoricalDataLoading(true);
+        try {
+          const data = await getHistoricalNetWorthData('year');
+          setHistoricalData(data);
+        } catch (error) {
+          console.error('Error fetching historical data:', error);
+        } finally {
+          setHistoricalDataLoading(false);
+        }
+      }
+    };
+    
+    fetchHistoricalData();
+  }, [financialSources, getHistoricalNetWorthData]);
 
   // Filter sources based on search term, type, and active status
   const filteredSources = financialSources.filter((source) => {
@@ -235,6 +259,21 @@ const FinancialSourcesList = () => {
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
         />
+        
+        {/* Financial Reports Section */}
+        {/* <div className="mt-8">
+          {historicalDataLoading ? (
+            <div className="flex items-center justify-center h-64 bg-slate-800/60 rounded-xl border border-slate-700/50">
+              <TbLoader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <span className="ml-3 text-slate-300">Loading reports...</span>
+            </div>
+          ) : (
+            <ReportsComponent 
+              financialSources={financialSources} 
+              historicalData={historicalData} 
+            />
+          )}
+        </div> */}
       </MainLayout>
 
       {/* Modals */}

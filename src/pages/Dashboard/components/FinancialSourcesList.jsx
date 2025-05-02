@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   TbPlus, 
   TbChevronRight,
+  TbChevronLeft,
   TbWallet
 } from 'react-icons/tb';
 import { formatCurrency, getRelativeTimeString } from '../../../utils/formatters';
+import MpesaIcon from '../../../components/ui/MpesaIcon';
 
 const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // Calculate pagination values
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentSources = sourceData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sourceData.length / itemsPerPage);
   return (
     <div className="md:mt-8 bg-slate-800/60 shadow-xl md:rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
       <div className="px-4 md:px-6 py-5 border-b border-slate-700/50">
@@ -25,7 +35,7 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
       <div className="overflow-hidden">
         <div className="flow-root">
           <ul className="divide-y divide-slate-700/30">
-            {sourceData.map((source) => (
+            {currentSources.map((source) => (
               <li key={source.id} className="px-3 md:px-6 py-5 hover:bg-slate-700/30 transition duration-150 ease-in-out">
                 <Link to={`/financial-sources/${source.id}`} className="block">
                   <div className="flex items-center">
@@ -92,14 +102,58 @@ const FinancialSourcesList = ({ sourceData, getTypeIcon, getTypeLabel }) => {
           </div>
         )}
         {sourceData.length > 0 && (
-          <div className="px-6 py-4 border-t border-slate-700/50 bg-slate-700/30">
-            <Link
-              to="/financial-sources"
-              className="text-sm font-medium text-primary-400 hover:text-primary-300 flex items-center justify-center"
-            >
-              View all financial sources
-              <TbChevronRight className="ml-1 h-4 w-4" />
-            </Link>
+          <div className="px-3 md:px-6 py-4 border-t border-slate-700/50 bg-slate-700/30">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-slate-400 ">
+                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, sourceData.length)} of {sourceData.length} {sourceData.length === 1 ? 'source' : 'sources'}
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {totalPages > 1 && (
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Previous page"
+                    >
+                      <TbChevronLeft className="h-4 w-4" />
+                    </button>
+                    
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors ${currentPage === page 
+                            ? 'bg-primary-600 text-white' 
+                            : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'}`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Next page"
+                    >
+                      <TbChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+                
+                {/* <Link
+                  to="/financial-sources"
+                  className="text-sm font-medium text-primary-400 hover:text-primary-300 flex items-center"
+                >
+                  View all Sources
+                  <TbChevronRight className="ml-1 h-4 w-4" />
+                </Link> */}
+              </div>
+            </div>
           </div>
         )}
       </div>

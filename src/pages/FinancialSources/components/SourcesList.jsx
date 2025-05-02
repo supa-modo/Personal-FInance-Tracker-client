@@ -5,6 +5,7 @@ import {
   TbTrash, 
   TbEye,
   TbChevronRight,
+  TbChevronLeft,
   TbWallet,
   TbEdit,
   TbDotsVertical,
@@ -20,6 +21,14 @@ const SourcesList = ({
 }) => {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // Calculate pagination values
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentSources = sources.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sources.length / itemsPerPage);
   
   const handleRowClick = (sourceId, e) => {
     // Don't navigate if the click was on a button or its children
@@ -67,7 +76,7 @@ const SourcesList = ({
       ) : (
         <div className="overflow-hidden">
           <ul className="divide-y divide-slate-700/30">
-            {sources.map((source) => (
+            {currentSources.map((source) => (
               <li 
                 key={source.id} 
                 className="hover:bg-slate-700/30 transition-colors duration-200 cursor-pointer relative"
@@ -183,11 +192,47 @@ const SourcesList = ({
       )}
       
       {sources.length > 0 && (
-        <div className="px-6 py-4 border-t border-slate-700/50 bg-slate-700/30">
-          <div className="text-center text-sm">
+        <div className="px-2 md:px-6 py-4 border-t border-slate-700/50 bg-slate-700/30">
+          <div className="flex  justify-between items-center text-sm">
             <span className="text-slate-400">
-              Showing {sources.length} {sources.length === 1 ? 'source' : 'sources'}
+              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, sources.length)} of {sources.length} {sources.length === 1 ? 'source' : 'sources'}
             </span>
+            
+            {totalPages > 1 && (
+              <div className="flex items-center space-x-1 md:space-x-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-1 md:p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Previous page"
+                >
+                  <TbChevronLeft className="h-5 w-5" />
+                </button>
+                
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-6 md:w-8 h-6 md:h-8 rounded-lg flex items-center justify-center transition-colors ${currentPage === page 
+                        ? 'bg-primary-600 text-white' 
+                        : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'}`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-1 md:p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Next page"
+                >
+                  <TbChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

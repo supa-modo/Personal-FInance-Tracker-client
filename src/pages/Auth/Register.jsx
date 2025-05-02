@@ -36,7 +36,7 @@ const Register = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
   
@@ -89,7 +89,7 @@ const Register = () => {
       try {
         setIsSubmitting(true);
         await register(formData.name, formData.email, formData.password);
-        navigate('/');
+        navigate('/dashboard');
       } catch (error) {
         console.error('Registration error:', error);
       } finally {
@@ -131,10 +131,12 @@ const Register = () => {
           {/* Top section with logo and headline */}
           <div className="pt-8 pl-6">
             <div className="flex items-center space-x-3 mb-10">
-              <div className="p-3 bg-gradient-to-br from-primary-500/30 to-primary-700/30 rounded-2xl backdrop-blur-xl shadow-xl border border-primary-500/20">
-                <TbChartPie className="h-8 w-8 text-primary-300" />
-              </div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">FinanceFlow</h1>
+              <a href="/" className="flex items-center space-x-3">
+                <div className="p-3 bg-gradient-to-br from-primary-500/30 to-primary-700/30 rounded-2xl backdrop-blur-xl shadow-xl border border-primary-500/20">
+                  <TbChartPie className="h-8 w-8 text-primary-300" />
+                </div>
+                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">FinanceFlow</h1>
+              </a>
             </div>
             
             <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight max-w-3xl">

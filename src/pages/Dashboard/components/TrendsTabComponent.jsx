@@ -199,7 +199,7 @@ const TrendsTabComponent = ({ historicalData, financialSources, netWorthEvents, 
     if (active && payload && payload.length) {
       try {
         return (
-          <div className="bg-slate-800 py-1.5 px-2 md:py-2 md:px-3 text-[0.8rem] md:text-[0.85rem] border border-slate-700 rounded-lg shadow-lg">
+          <div className="bg-primary-300/40 py-1.5 px-2 md:py-2 md:px-3 text-[0.8rem] md:text-[0.85rem] border border-slate-700 rounded-lg shadow-lg">
             <p className="text-slate-300 font-medium">
               {typeof label === 'string' ? 
                 new Date(label).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 
@@ -474,8 +474,8 @@ const TrendsTabComponent = ({ historicalData, financialSources, netWorthEvents, 
                 <Bar 
                   dataKey="change" 
                   name="Monthly Change"
-                  fill={(data) => data.change >= 0 ? "#10B981" : "#EF4444"}
-                  radius={[4, 4, 0, 0]} 
+                  fill= "#4F46E5"
+                  radius={[6, 6, 0, 0]}
                 />
               </BarChart>
             </ResponsiveContainer>

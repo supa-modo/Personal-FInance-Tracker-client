@@ -12,8 +12,8 @@ import {
   TbWallet,
   TbCreditCard,
   TbBuildingBank,
-  TbCash,
-  TbCoin
+  TbCurrencyDollar,
+  TbPigMoney
 } from 'react-icons/tb';
 import { 
   PieChart, 
@@ -29,6 +29,7 @@ import {
   Legend
 } from 'recharts';
 import { formatCurrency, formatPercentage } from '../../../utils/formatters';
+import MpesaIcon from '../../../components/ui/MpesaIcon';
 
 const AssetsTabComponent = ({ financialSources }) => {
   const [sortBy, setSortBy] = useState('balance');
@@ -44,13 +45,13 @@ const AssetsTabComponent = ({ financialSources }) => {
       case 'STOCKS':
         return <TbChartBar className="h-5 w-5" />;
       case 'MONEY_MARKET':
-        return <TbCoin className="h-5 w-5" />;
+        return <TbPigMoney className="h-5 w-5" />;
       case 'MPESA':
-        return <TbCreditCard className="h-5 w-5" />;
+        return <MpesaIcon width={45} height={24} />;
       case 'SACCO':
         return <TbWallet className="h-5 w-5" />;
       case 'CASH':
-        return <TbCash className="h-5 w-5" />;
+        return <TbCurrencyDollar className="h-5 w-5" />;
       default:
         return <TbWallet className="h-5 w-5" />;
     }

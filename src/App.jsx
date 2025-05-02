@@ -1,7 +1,6 @@
-
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ScrollToTop from "./components/ui/ScrollToTop";
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -18,6 +17,7 @@ import FinancialSourcesList from './pages/FinancialSources/FinancialSourcesList'
 import FinancialSourceDetail from './pages/FinancialSources/FinancialSourceDetail';
 import ProfilePage from './pages/Profile/ProfilePage';
 import NotFound from './pages/NotFound/NotFound';
+import LandingPage from './pages/Landing/LandingPage';
 import { TbLoader2 } from 'react-icons/tb';
 
 // Protected Route Component
@@ -40,13 +40,16 @@ function App() {
     <AuthProvider>
       <FinancialProvider>
         <Router>
+          
+        <ScrollToTop />
           <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
             {/* Protected Routes */}
-            <Route path="/" element={
+            <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>

@@ -41,7 +41,7 @@ const MainLayout = ({ children }) => {
   };
 
   const navigationItems = [
-    { path: '/', label: 'Dashboard', icon: <MdSpaceDashboard size={20} /> },
+    { path: '/dashboard', label: 'Dashboard', icon: <MdSpaceDashboard size={20} /> },
     { path: '/financial-sources', label: 'Financial Sources', icon: <TbWallet size={20} /> },
   ];
 
@@ -68,7 +68,7 @@ const MainLayout = ({ children }) => {
             {/* Logo and mobile menu button */}
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link to="/" className="flex items-center">
+                <Link to="/dashboard" className="flex items-center">
                   <div className="p-1.5 bg-gradient-to-br from-primary-500/30 to-primary-700/30 rounded-xl backdrop-blur-xl shadow-xl border border-primary-500/20">
                     <TbChartPie className="h-6 w-6 text-primary-300" />
                   </div>

@@ -61,7 +61,7 @@ const ProfileForm = ({
     >
       <div className="mb-4 md:mb-6 pb-3 md:pb-6 border-b border-white/10">
         <div className="flex items-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-gray-500 to-gray-700 flex items-center justify-center text-white mr-4">
+          <div className="w-14 md:w-16 h-14 md:h-16 rounded-full bg-gradient-to-r from-gray-500 to-gray-700 flex items-center justify-center text-white mr-4">
             {getInitials(user?.name)} 
           </div>
           <div>

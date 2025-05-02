@@ -17,7 +17,7 @@ import QuickActions from "./components/QuickActions";
 import { LoadingState, ErrorState } from "./components/DashboardStates";
 import AssetsTabComponent from "./components/AssetsTabComponent";
 import TrendsTabComponent from "./components/TrendsTabComponent";
-import ReportsComponent from "./components/ReportsComponent";
+import MpesaIcon from "../../components/ui/MpesaIcon";
 
 // Import icons
 import {
@@ -342,7 +342,7 @@ const Dashboard = () => {
       case "STOCKS":
         return <TbTrendingUp className="h-6 w-6 text-white" />;
       case "MPESA":
-        return <TbCreditCard className="h-6 w-6 text-white" />;
+        return <MpesaIcon width={45} height={24} />;
       case "SACCO":
         return <TbWallet className="h-6 w-6 text-white" />;
       case "CASH":
