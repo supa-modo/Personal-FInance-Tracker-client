@@ -12,6 +12,7 @@ import {
   TbLoader,
   TbLoader2,
 } from "react-icons/tb";
+import  MpesaIcon  from "../../components/ui/MpesaIcon";
 import MainLayout from "../../components/layout/MainLayout";
 import useFinancial from "../../hooks/useFinancial";
 import SourcesFilter from "./components/SourcesFilter";
@@ -154,7 +155,7 @@ const FinancialSourcesList = () => {
       case "STOCKS":
         return <TbTrendingUp className="h-6 w-6 text-white" />;
       case "MPESA":
-        return <TbCreditCard className="h-6 w-6 text-white" />;
+        return <MpesaIcon width={45} height={24} />;
       case "SACCO":
         return <TbWallet className="h-6 w-6 text-white" />;
       case "CASH":
@@ -169,7 +170,7 @@ const FinancialSourcesList = () => {
   if (loading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center h-64">
+        <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
           <div className=" flex items-center justify-center">
             <TbLoader2 className="h-12 w-12 text-primary-500 animate-spin" />
           </div>
@@ -249,7 +250,7 @@ const FinancialSourcesList = () => {
           setIsEditModalOpen(false);
           setSourceToEdit(null);
         }}
-        onEdit={handleEditSource}
+        onSubmit={handleEditSource}
         source={sourceToEdit}
       />
 

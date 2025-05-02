@@ -93,7 +93,7 @@ export const createFinancialSource = async (sourceData) => {
     const backendSourceData = {
       name: sourceData.name,
       type: sourceData.type,
-      institution: source.institution,
+      institution: sourceData.institution,
       description: sourceData.description,
       color_code: sourceData.colorCode || '#3B82F6', // Default to blue if not set
       is_active: sourceData.isActive !== undefined ? sourceData.isActive : true

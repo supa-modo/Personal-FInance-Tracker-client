@@ -1,58 +1,92 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  TbArrowLeft, 
-  TbPencil, 
-  TbTrash, 
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  TbArrowLeft,
+  TbPencil,
+  TbTrash,
   TbRefresh,
   TbCurrencyDollar,
   TbEdit,
-  TbCoins
-} from 'react-icons/tb';
-import { formatCurrency, getRelativeTimeString } from '../../../utils/formatters';
+  TbCoins,
+  TbBuildingBank,
+  TbPigMoney,
+  TbTrendingUp,
+  TbWallet,
+} from "react-icons/tb";
+import {
+  formatCurrency,
+  getRelativeTimeString,
+} from "../../../utils/formatters";
+import { PiMoneyWavyDuotone } from "react-icons/pi";
+import MpesaIcon from "../../../components/ui/MpesaIcon";
 
-const SourceHeaderEnhanced = ({ 
-  source, 
-  latestBalance, 
-  lastUpdated, 
-  onEditClick, 
-  onDeleteClick, 
-  onUpdateBalanceClick 
+const SourceHeaderEnhanced = ({
+  source,
+  latestBalance,
+  lastUpdated,
+  onEditClick,
+  onDeleteClick,
+  onUpdateBalanceClick,
 }) => {
+  // Helper function to get type icon
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case "BANK_ACCOUNT":
+        return <TbBuildingBank className="h-6 w-6 text-white" />;
+      case "MONEY_MARKET":
+        return <TbPigMoney className="h-6 w-6 text-white" />;
+      case "STOCKS":
+        return <TbTrendingUp className="h-6 w-6 text-white" />;
+      case "MPESA":
+        return <MpesaIcon width={45} height={24} />;
+      case "SACCO":
+        return <TbWallet className="h-6 w-6 text-white" />;
+      case "CASH":
+        return <PiMoneyWavyDuotone className="h-6 w-6 text-white" />;
+      case "OTHER":
+        return <TbCurrencyDollar className="h-6 w-6 text-white" />;
+      default:
+        return <TbCurrencyDollar className="h-6 w-6 text-white" />;
+    }
+  };
+
   return (
     <div className="pb-5 px-2 mb-8">
       {/* Back link */}
-      <Link 
-        to="/financial-sources" 
+      <Link
+        to="/financial-sources"
         className="inline-flex items-center mb-6 text-sm font-medium text-slate-400 hover:text-primary-400 transition-colors"
       >
         <TbArrowLeft className="mr-1 h-4 w-4" />
         Back to Financial Sources
       </Link>
-      
+
       <div className="bg-slate-800/60 shadow-xl rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm hover:shadow-primary-900/20 hover:border-slate-600/50 transition-all duration-300">
         <div className="px-3 md:px-6 py-3 md:py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between">
             <div className="flex items-center">
-              <div 
+              <div
                 className="flex-shrink-0 h-12 md:h-16 w-12 md:w-16 rounded-xl shadow-lg flex items-center justify-center"
-                style={{ backgroundColor: source?.colorCode || '#3b82f6'}}
+                style={{ backgroundColor: source?.colorCode || "#3b82f6" }}
               >
-                <TbCoins className="h-9 w-9 text-white" />
+                {getTypeIcon(source?.type) || (
+                  <TbCoins className="h-9 w-9 text-white" />
+                )}
               </div>
               <div className="ml-5">
                 <h1 className="text-lg md:text-2xl font-bold text-white">
                   {source?.name}
                 </h1>
                 <p className="mt-1 text-sm text-slate-400 truncate">
-                  {source.institution || "Institution"} - {source?.description || 'No description'}
+                  {source.institution || "Institution"} -{" "}
+                  {source?.description || "No description"}
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-4 md:mt-0 flex md:flex-col flex-row-reverse justify-between md:items-end">
               <div className="text-2xl md:text-3xl font-bold text-primary-500">
-                {formatCurrency(latestBalance) }
+                {formatCurrency(latestBalance)}
               </div>
               {lastUpdated && (
                 <div className="mt-1 text-sm text-slate-500">
@@ -67,7 +101,7 @@ const SourceHeaderEnhanced = ({
             </div>
           </div>
         </div>
-        
+
         <div className="px-2 md:px-6 py-4 border-t border-slate-700/50 bg-slate-700/30">
           <div className="flex flex-wrap gap-3">
             <button
@@ -82,14 +116,14 @@ const SourceHeaderEnhanced = ({
               className="inline-flex items-center px-4 py-2 border border-slate-600 rounded-lg text-sm font-medium text-white bg-slate-700/50 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all duration-200"
             >
               <TbEdit className="mr-2 h-4 w-4" />
-              Edit <span className='hidden lg:inline ml-1'>Source</span>
+              Edit <span className="hidden lg:inline ml-1">Source</span>
             </button>
             <button
               onClick={onDeleteClick}
               className="inline-flex items-center px-4 py-2 border border-red-800/50 rounded-lg text-sm font-medium text-red-300 bg-red-900/30 hover:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
             >
               <TbTrash className="mr-2 h-4 w-4" />
-              Delete <span className='hidden lg:inline ml-1'>Source</span>
+              Delete <span className="hidden lg:inline ml-1">Source</span>
             </button>
           </div>
         </div>
