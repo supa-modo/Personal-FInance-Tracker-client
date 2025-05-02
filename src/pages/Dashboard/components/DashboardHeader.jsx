@@ -5,7 +5,7 @@ import { TbPlus, TbRefresh } from 'react-icons/tb';
 const DashboardHeader = ({ timePeriod, setTimePeriod, isRefreshing, refreshDashboardData }) => {
   return (
     <div className="pb-4 px-4 md:px-0 md:mb-4 sm:flex sm:items-center sm:justify-between">
-      <h1 className="text-3xl font-bold text-white ">Financial Dashboard</h1>
+      <h1 className="text-[1.35rem] sm:text-2xl md:text-3xl font-bold text-white ">Financial Dashboard</h1>
       <div className="mt-3 sm:mt-0 sm:ml-4 flex space-x-2 md:space-x-3">
         <div className="relative inline-block text-left w-[35%] md:w-auto">
           <select

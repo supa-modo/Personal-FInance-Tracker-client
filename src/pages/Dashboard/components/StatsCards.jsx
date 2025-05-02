@@ -22,15 +22,15 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm text-slate-400 truncate">
+                <dt className="text-[0.8rem] md:text-sm text-slate-400 truncate">
                   Total Net Worth
                 </dt>
-                <dd className="">
-                  <div className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">
+                <dd className="font-lexend">
+                  <div className="text-[1.35rem] sm:text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">
                     {formatCurrency(netWorth)}
                   </div>
                   {change.amount !== 0 && (
-                    <div className={`flex items-baseline text-sm font-semibold ${
+                    <div className={`flex items-baseline text-[0.8rem] md:text-sm font-semibold ${
                       change.isPositive ? 'text-green-400' : 'text-red-400'
                     }`}>
                       {change.isPositive ? (
@@ -69,14 +69,14 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm text-slate-400 truncate">
+                <dt className="text-[0.8rem] md:text-sm text-slate-400 truncate">
                   Total Assets
                 </dt>
-                <dd>
-                  <div className="text-2xl md:text-3xl font-bold text-white">
+                <dd className='font-lexend'>
+                  <div className="text-[1.35rem] sm:text-2xl md:text-3xl font-bold text-white">
                     {formatCurrency(totalAssets)}
                   </div>
-                  <div className="mt-1 text-sm text-slate-400">
+                  <div className="mt-1 text-[0.8rem] md:text-sm text-slate-400">
                     Across {activeSources} active sources
                   </div>
                 </dd>
@@ -103,10 +103,10 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm text-slate-400 truncate">
+                <dt className="text-[0.8rem] md:text-sm text-slate-400 truncate">
                   Last Updated
                 </dt>
-                <dd>
+                <dd className='font-lexend'>
                   <div className="text-xl font-semibold text-white">
                     {sourceData.length > 0 && sourceData.some(s => s.lastUpdated) ? 
                       formatDate(sourceData.sort((a, b) => 
@@ -115,7 +115,7 @@ const StatsCards = ({ netWorth, totalAssets, change, activeSources, sourceData }
                       'No updates yet'
                     }
                   </div>
-                  <div className="mt-1 text-sm text-slate-400">
+                  <div className="mt-1 text-[0.8rem] md:text-sm text-slate-400">
                     {sourceData.length > 0 && sourceData.some(s => s.lastUpdated) ? 
                       getRelativeTimeString(sourceData.sort((a, b) => 
                         new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0)

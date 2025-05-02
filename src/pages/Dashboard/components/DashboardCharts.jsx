@@ -118,6 +118,7 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
                   outerRadius={130}
                   innerRadius={70}
                   paddingAngle={2}
+                  fontSize={12}
                   fill="#8884d8"
                   dataKey="value"
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
@@ -132,7 +133,7 @@ const DashboardCharts = ({ lineChartData, pieChartData }) => {
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value) => formatCurrency(value, { notation: 'compact' })}
                   contentStyle={{ 
                     backgroundColor: 'rgba(15, 23, 42, 0.9)', 
                     borderRadius: '8px',
