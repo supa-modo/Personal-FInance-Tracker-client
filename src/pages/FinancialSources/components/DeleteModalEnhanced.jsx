@@ -1,7 +1,7 @@
 import React from 'react';
-import { TbAlertTriangle, TbTrash, TbX } from 'react-icons/tb';
+import { TbAlertTriangle, TbTrash, TbX, TbLoader } from 'react-icons/tb';
 
-const DeleteModalEnhanced = ({ isOpen, onClose, onConfirm, sourceName }) => {
+const DeleteModalEnhanced = ({ isOpen, onClose, onConfirm, sourceName, isLoading = false }) => {
   if (!isOpen) return null;
 
   return (
@@ -46,19 +46,29 @@ const DeleteModalEnhanced = ({ isOpen, onClose, onConfirm, sourceName }) => {
               type="button"
               className="inline-flex justify-center w-full rounded-xl border border-slate-600 px-4 py-2.5 bg-slate-700/50 text-base font-medium text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 sm:text-sm transition-all duration-200"
               onClick={onClose}
+              disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="button"
-              className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm transition-all duration-200"
+              className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-xl border border-transparent px-4 py-2.5 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
               onClick={onConfirm}
+              disabled={isLoading}
             >
               <div className='flex items-center space-x-2'>
-                <TbTrash size={19}/>
-                <span>Delete Source</span>
+                {isLoading ? (
+                  <>
+                    <TbLoader size={19} className="animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <TbTrash size={19}/>
+                    <span>Delete Source</span>
+                  </>
+                )}
               </div>
-              
             </button>
           </div>
         </div>

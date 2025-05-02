@@ -133,7 +133,7 @@ const SourcesList = ({
                       
                       {/* Mobile menu dropdown */}
                       {activeMenu === source.id && (
-                        <div className="absolute right-6 mt-1 z-10 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1 w-36">
+                        <div className="absolute right-6 mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1 w-36">
                           
                           
                           <button

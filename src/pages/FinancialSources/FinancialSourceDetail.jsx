@@ -11,7 +11,7 @@ import BalanceUpdatesEnhanced from "./components/BalanceUpdatesEnhanced";
 import DeleteModalEnhanced from "./components/DeleteModalEnhanced";
 import UpdateBalanceModalEnhanced from "./components/UpdateBalanceModalEnhanced";
 import EditFinancialSourceModalEnhanced from "./components/EditFinancialSourceModalEnhanced";
-import { TbAlertCircle, TbRefresh, TbArrowLeft } from "react-icons/tb";
+import { TbAlertCircle, TbRefresh, TbArrowLeft, TbLoader2 } from "react-icons/tb";
 import { formatDate } from "../../utils/formatters";
 
 const FinancialSourceDetail = () => {
@@ -30,6 +30,7 @@ const FinancialSourceDetail = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [updateForm, setUpdateForm] = useState({
     balance: "",
     notes: "",
@@ -56,11 +57,13 @@ const FinancialSourceDetail = () => {
   };
 
   const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
     try {
       await deleteFinancialSource(id);
       navigate("/financial-sources");
     } catch (error) {
       console.error("Error deleting financial source:", error);
+      setIsDeleting(false); // Reset deleting state on error
     }
   };
 
@@ -141,9 +144,9 @@ const FinancialSourceDetail = () => {
     return (
       <MainLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-500 mx-auto"></div>
-            <p className="mt-6 text-gray-600 font-medium">
+        <div className=" flex flex-col items-center justify-center">
+            <TbLoader2 className="h-12 w-12 text-primary-500 animate-spin" />
+            <p className="mt-3 text-gray-600 font-medium">
               Loading financial source details...
             </p>
           </div>
@@ -323,9 +326,10 @@ const FinancialSourceDetail = () => {
       {/* Delete confirmation modal */}
       <DeleteModalEnhanced
         isOpen={isDeleteModalOpen}
-        source={source}
-        onClose={() => setIsDeleteModalOpen(false)}
+        sourceName={source?.name}
+        onClose={() => !isDeleting && setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
       />
 
       {/* Update balance modal */}
