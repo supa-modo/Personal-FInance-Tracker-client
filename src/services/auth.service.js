@@ -91,13 +91,39 @@ export const register = async (name, email, password) => {
  */
 export const logout = async () => {
   try {
+    console.log('Logging out user...');
+    
     // Call the logout endpoint to clear cookies
-    await apiClient.get('/auth/logout');
+    const response = await apiClient.get('/auth/logout');
+    console.log('Logout API response:', response.data);
     
     // Remove the user from localStorage
     localStorage.removeItem('user-personal-finance');
+    console.log('User data removed from localStorage');
     
-    return { success: true };
+    // Clear any cached API data
+    if (window.caches) {
+      try {
+        const cacheNames = await window.caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => {
+            return window.caches.delete(cacheName);
+          })
+        );
+        console.log('Browser cache cleared');
+      } catch (cacheError) {
+        console.warn('Failed to clear browser cache:', cacheError);
+      }
+    }
+    
+    // Force reload to ensure all state is cleared
+    // This is optional but helps ensure a clean slate
+    // window.location.href = '/login';
+    
+    return { 
+      success: true,
+      message: response.data?.message || 'Logged out successfully' 
+    };
   } catch (error) {
     console.error('Logout failed:', error.response?.data?.message || error.message);
     // Still remove from localStorage even if API call fails

@@ -127,12 +127,25 @@ export const AuthProvider = ({ children }) => {
       // Call the logout service
       await authService.logout();
       
-      // Update the state
+      // Clear user state
       setUser(null);
+      
+      // Force clear any cached authentication state
+      localStorage.removeItem('user-personal-finance');
+      
+      // Redirect to login page
+      window.location.href = '/login';
+      
+      return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
-      // Still clear the user state even if API call fails
+      setError(error.message);
+      
+      // Still clear user state even if API call fails
       setUser(null);
+      localStorage.removeItem('user-personal-finance');
+      
+      return { success: false, error: error.message };
     } finally {
       setLoading(false);
     }
