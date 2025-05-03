@@ -292,7 +292,7 @@ const TrendsTabComponent = ({ historicalData, financialSources, netWorthEvents, 
         {/* Current Net Worth Card */}
         <div className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm mx-2.5 md:mx-0 p-3 md:p-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-400 text-sm font-medium">Current Net Worth</h3>
+            <h3 className="text-slate-400 text-[0.8rem] md:text-sm font-medium">Current Net Worth</h3>
             <div className="bg-primary-500/20 rounded-full p-2">
               <TbChartLine className="h-5 w-5 text-primary-500" />
             </div>
@@ -313,7 +313,7 @@ const TrendsTabComponent = ({ historicalData, financialSources, netWorthEvents, 
         {/* Growth Rate Card */}
         <div className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50 backdrop-blur-sm mx-2.5 md:mx-0 p-3 md:p-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-400 text-sm font-medium">Growth Rate (CAGR)</h3>
+            <h3 className="text-slate-400 text-[0.8rem] md:text-sm font-medium">Growth Rate (CAGR)</h3>
             <div className={`${growthRate >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'} rounded-full p-2`}>
               {growthRate >= 0 ? (
                 <TbArrowUpRight className="h-5 w-5 text-green-500" />
@@ -335,7 +335,7 @@ const TrendsTabComponent = ({ historicalData, financialSources, netWorthEvents, 
         {/* Time Period Card */}
         <div className="bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 backdrop-blur-sm mx-2.5 md:mx-0 p-3 md:p-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-400 text-sm font-medium">Time Period</h3>
+            <h3 className="text-slate-400 text-[0.8rem] md:text-sm font-medium">Time Period</h3>
             <div className="bg-purple-500/20 rounded-full p-2">
               <TbCalendarStats className="h-5 w-5 text-purple-500" />
             </div>

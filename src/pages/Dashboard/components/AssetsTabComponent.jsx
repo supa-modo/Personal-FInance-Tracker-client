@@ -284,7 +284,7 @@ const AssetsTabComponent = ({ financialSources }) => {
         {/* Total Assets Card */}
         <div className="bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 backdrop-blur-sm p-3 md:p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-400 text-sm font-medium">Total Assets Value</h3>
+            <h3 className="text-slate-400 text-[0.8rem] md:text-sm font-medium">Total Assets Value</h3>
             <div className="bg-primary-500/20 rounded-full p-2">
               <TbWallet className="h-5 w-5 text-primary-500" />
             </div>
@@ -298,7 +298,7 @@ const AssetsTabComponent = ({ financialSources }) => {
         {/* Highest Value Asset */}
         <div className="bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 backdrop-blur-sm p-3 md:p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-400 text-sm font-medium">Highest Value Asset</h3>
+            <h3 className="text-slate-400 text-[0.8rem] md:text-sm font-medium">Highest Value Asset</h3>
             <div className="bg-green-500/20 rounded-full p-2">
               <TbArrowUpRight className="h-5 w-5 text-green-500" />
             </div>
@@ -321,7 +321,7 @@ const AssetsTabComponent = ({ financialSources }) => {
         {/* Most Diverse Category */}
         <div className="bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 backdrop-blur-sm p-3 md:p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-400 text-sm font-medium">Largest Asset Category</h3>
+            <h3 className="text-slate-400 text-[0.8rem] md:text-sm font-medium">Largest Asset Category</h3>
             <div className="bg-blue-500/20 rounded-full p-2">
               <TbChartPie className="h-5 w-5 text-blue-500" />
             </div>
