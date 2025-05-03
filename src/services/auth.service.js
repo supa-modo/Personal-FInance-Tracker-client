@@ -295,6 +295,8 @@ export const forgotPassword = async (email) => {
  */
 export const resetPassword = async (token, password, passwordConfirm) => {
   try {
+    console.log('Reset password function called with token:', token.substring(0, 5) + '...');
+    
     // Validate input
     if (!token) {
       throw new Error('Reset token is required');
@@ -309,13 +311,17 @@ export const resetPassword = async (token, password, passwordConfirm) => {
     }
 
     // Make the API call
+    console.log('Sending reset password request to server...');
     const response = await apiClient.post(`/auth/reset-password/${token}`, {
       password,
       passwordConfirm
     });
     
+    console.log('Reset password response:', response.data);
+    
     // If login is successful after reset, store the user data
     if (response.data && response.data.data && response.data.data.user) {
+      console.log('Storing user data after password reset');
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
       
       // If token is provided directly in the response, store it in memory

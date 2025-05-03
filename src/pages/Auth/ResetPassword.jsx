@@ -91,7 +91,9 @@ const ResetPassword = () => {
     if (validateForm()) {
       try {
         setIsSubmitting(true);
-        // await resetPassword(token, formData.password, formData.passwordConfirm);
+        console.log('Resetting password with token:', token);
+        await resetPassword(token, formData.password, formData.passwordConfirm);
+        console.log('Password reset successful');
         setIsSuccess(true);
         
         setTimeout(() => {
