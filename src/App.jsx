@@ -12,6 +12,8 @@ import useAuth from './hooks/useAuth';
 // Pages
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FinancialSourcesList from './pages/FinancialSources/FinancialSourcesList';
 import FinancialSourceDetail from './pages/FinancialSources/FinancialSourceDetail';
@@ -44,12 +46,19 @@ function App() {
         <ScrollToTop />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
+            {/* <Route path="/" element={<LandingPage />} /> */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>

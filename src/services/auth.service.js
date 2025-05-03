@@ -219,9 +219,12 @@ export const updateProfile = async (profileData) => {
  */
 export const updateNotificationSettings = async (settingsData) => {
   try {
-    const response = await apiClient.patch('/auth/update-notification-settings', settingsData);
+    const response = await apiClient.patch('/auth/update-notification-settings', {
+      notification_settings: settingsData
+    });
     
     if (response.data && response.data.data && response.data.data.user) {
+      // Update the user in localStorage with the latest data
       localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
       return response.data.data.user;
     }
@@ -230,5 +233,76 @@ export const updateNotificationSettings = async (settingsData) => {
   } catch (error) {
     console.error('Notification settings update failed:', error.response?.data?.message || error.message);
     throw new Error(error.response?.data?.message || 'Notification settings update failed. Please try again.');
+  }
+};
+
+/**
+ * Request a password reset email
+ * @param {string} email - User's email address
+ * @returns {Promise<Object>} - Promise resolving to success status
+ * @throws {Error} - Throws an error if the request fails
+ */
+export const forgotPassword = async (email) => {
+  try {
+    // Validate input
+    if (!email) {
+      throw new Error('Email is required');
+    }
+
+    // Make the API call
+    const response = await apiClient.post('/auth/forgot-password', { email });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Forgot password request failed:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to send password reset email. Please try again.');
+  }
+};
+
+/**
+ * Reset password using token
+ * @param {string} token - Password reset token
+ * @param {string} password - New password
+ * @param {string} passwordConfirm - New password confirmation
+ * @returns {Promise<Object>} - Promise resolving to user data
+ * @throws {Error} - Throws an error if the password reset fails
+ */
+export const resetPassword = async (token, password, passwordConfirm) => {
+  try {
+    // Validate input
+    if (!token) {
+      throw new Error('Reset token is required');
+    }
+    
+    if (!password || !passwordConfirm) {
+      throw new Error('Password and confirmation are required');
+    }
+    
+    if (password !== passwordConfirm) {
+      throw new Error('Passwords do not match');
+    }
+
+    // Make the API call
+    const response = await apiClient.post(`/auth/reset-password/${token}`, {
+      password,
+      passwordConfirm
+    });
+    
+    // If login is successful after reset, store the user data
+    if (response.data && response.data.data && response.data.data.user) {
+      localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
+      
+      // If token is provided directly in the response, store it in memory
+      if (response.data.token) {
+        setToken(response.data.token);
+      }
+      
+      return response.data.data.user;
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Password reset failed:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Password reset failed. Please try again.');
   }
 };

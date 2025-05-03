@@ -21,9 +21,9 @@ const CtaSection = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-4xl mx-auto overflow-hidden"
+          className="max-w-6xl mx-auto overflow-hidden"
         >
-          <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-8 md:p-12 border border-slate-700/50 shadow-2xl transform hover:scale-[1.01] transition-all duration-500 group">
+          <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-8 md:p-12 border border-slate-700/50 shadow-2xl group">
             {/* Premium badge */}
             <div className="absolute -top-5 -right-5 z-10">
               <div className="relative">
@@ -155,19 +155,18 @@ const CtaSection = () => {
             >
               <div className="absolute -inset-px bg-gradient-to-r from-primary-500/20 to-blue-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
               <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 h-full flex flex-col hover:border-slate-600/50 transition-colors duration-300">
-                <div className="mb-5">
+                <div className="flex items-start space-x-4">
                   <div className={`inline-flex items-center justify-center p-3 rounded-lg bg-gradient-to-br ${feature.color} text-white`}>
                     {feature.icon}
                   </div>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
+                
+                <div>
+                <h3 className="text-lg font-bold text-white">{feature.title}</h3>
                 <p className="text-slate-300 flex-grow">{feature.description}</p>
-                <div className="mt-4 pt-4 border-t border-slate-700/50">
-                  <Link to="/register" className="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center">
-                    Get started
-                    <TbArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Link>
+                
                 </div>
+                </div>  
+               
               </div>
             </motion.div>
           ))}
