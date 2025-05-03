@@ -13,6 +13,22 @@ export const AuthProvider = ({ children }) => {
   // State for authentication error
   const [error, setError] = useState(null);
 
+  // Check if the current route is a public route that doesn't require authentication
+  const isPublicRoute = () => {
+    const publicRoutes = [
+      '/login', 
+      '/register', 
+      '/forgot-password',
+      '/reset-password'
+    ];
+    
+    const currentPath = window.location.pathname;
+    return publicRoutes.some(route => 
+      currentPath === route || 
+      (route === '/reset-password' && currentPath.startsWith('/reset-password/'))
+    );
+  };
+
   // Effect to check if the user is already logged in
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -21,6 +37,13 @@ export const AuthProvider = ({ children }) => {
         const storedUser = authService.getCurrentUser();
         if (storedUser) {
           setUser(storedUser);
+        }
+        
+        // Skip backend validation for public routes
+        if (isPublicRoute()) {
+          console.log('Public route detected, skipping backend authentication check');
+          setLoading(false);
+          return;
         }
         
         // Log the environment and authentication attempt
@@ -43,6 +66,11 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error('Error checking authentication:', error);
         setError('Failed to restore session');
+        
+        // If we're on a public route, don't show the error
+        if (isPublicRoute()) {
+          setError(null);
+        }
       } finally {
         setLoading(false);
       }

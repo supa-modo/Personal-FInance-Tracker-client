@@ -140,7 +140,7 @@ const ForgotPassword = () => {
       </div>
       
       {/* Right side - Enhanced Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center -mt-4 lg:mt-0 p-4 sm:p-6 lg:p-8 relative z-10">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center -mt-12 lg:mt-0 p-4 sm:p-6 lg:p-8 relative z-10">
         {/* Mobile-only back button */}
         <div className="lg:hidden w-full max-w-lg mb-6 flex justify-start">
           <Link 

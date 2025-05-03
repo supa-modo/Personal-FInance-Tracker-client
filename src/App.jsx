@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import ScrollToTop from "./components/ui/ScrollToTop";
 
 // Context Providers
@@ -22,69 +22,59 @@ import NotFound from './pages/NotFound/NotFound';
 import LandingPage from './pages/Landing/LandingPage';
 import { TbLoader2 } from 'react-icons/tb';
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center h-screen">
+    <TbLoader2 className='w-10 h-10 text-primary-500 animate-spin'/>
+  </div>
+);
+
+// Protected routes layout with both Auth and Financial providers
+const ProtectedLayout = () => {
   const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
-    return <div className="flex items-center justify-center h-screen"><TbLoader2 className='w-10 h-10 text-primary-500 animate-spin'/></div>;
+    return <LoadingSpinner />;
   }
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
-  return children;
+  return (
+    <FinancialProvider>
+      <Outlet />
+    </FinancialProvider>
+  );
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <FinancialProvider>
-        <Router>
+    <Router>
+      <ScrollToTop />
+      <AuthProvider>
+        <Routes>
+          {/* Public Routes - No Financial Provider */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          {/* <Route path="/" element={<LandingPage />} /> */}
           
-        <ScrollToTop />
-          <Routes>
-            {/* Public Routes */}
-            {/* <Route path="/" element={<LandingPage />} /> */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            
-            {/* Protected Routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/financial-sources" element={
-              <ProtectedRoute>
-                <FinancialSourcesList />
-              </ProtectedRoute>
-            } />
-            <Route path="/financial-sources/:id" element={
-              <ProtectedRoute>
-                <FinancialSourceDetail />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
-      </FinancialProvider>
-    </AuthProvider>
+          {/* Protected Routes with Financial Provider */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/financial-sources" element={<FinancialSourcesList />} />
+            <Route path="/financial-sources/:id" element={<FinancialSourceDetail />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+          
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 
