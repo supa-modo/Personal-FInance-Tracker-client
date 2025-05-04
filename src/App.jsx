@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import ScrollToTop from "./components/ui/ScrollToTop";
+import { Analytics } from "@vercel/analytics/react"
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -14,6 +15,8 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
+import OAuthSuccess from './pages/Auth/OAuthSuccess';
+import OAuthFailure from './pages/Auth/OAuthFailure';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FinancialSourcesList from './pages/FinancialSources/FinancialSourcesList';
 import FinancialSourceDetail from './pages/FinancialSources/FinancialSourceDetail';
@@ -21,6 +24,7 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import NotFound from './pages/NotFound/NotFound';
 import LandingPage from './pages/Landing/LandingPage';
 import { TbLoader2 } from 'react-icons/tb';
+
 
 // Loading component
 const LoadingSpinner = () => (
@@ -51,6 +55,7 @@ const ProtectedLayout = () => {
 function App() {
   return (
     <Router>
+      <Analytics />
       <ScrollToTop />
       <AuthProvider>
         <Routes>
@@ -59,6 +64,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
+          <Route path="/oauth-failure" element={<OAuthFailure />} />
           {/* <Route path="/" element={<LandingPage />} /> */}
           
           {/* Protected Routes with Financial Provider */}

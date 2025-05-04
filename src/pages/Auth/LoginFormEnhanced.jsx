@@ -27,6 +27,10 @@ const LoginFormEnhanced = ({
   handleSubmit,
   navigateToRegister,
   navigateToForgotPassword,
+  handleGoogleSignIn,
+  handleAppleSignIn,
+  isGoogleLoading,
+  isAppleLoading,
 }) => {
   return (
     <div
@@ -62,13 +66,33 @@ const LoginFormEnhanced = ({
 
         {/* Social login buttons */}
         <div className="flex space-x-4 mb-6 lg:mb-8">
-          <button className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20">
-            <FcGoogle className="h-5 w-5 mr-2 text-red-400" />
-            <span className="text-sm font-medium">Google</span>
+          <button 
+            onClick={handleGoogleSignIn}
+            disabled={isSubmitting}
+            className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20"
+          >
+            {isGoogleLoading ? (
+              <TbLoader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <FcGoogle className="h-5 w-5 mr-2 text-red-400" />
+                <span className="text-sm font-medium">Google</span>
+              </>
+            )}
           </button>
-          <button className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20">
-            <TbBrandApple className="h-5 w-5 mr-2" />
-            <span className="text-sm font-medium">Apple</span>
+          <button 
+            onClick={handleAppleSignIn}
+            disabled={isSubmitting}
+            className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20"
+          >
+            {isAppleLoading ? (
+              <TbLoader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <TbBrandApple className="h-5 w-5 mr-2" />
+                <span className="text-sm font-medium">Apple</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -298,6 +322,14 @@ const LoginFormEnhanced = ({
       </div>
     </div>
   );
+};
+
+// Set default props
+LoginFormEnhanced.defaultProps = {
+  isGoogleLoading: false,
+  isAppleLoading: false,
+  handleGoogleSignIn: () => console.warn('Google sign-in handler not provided'),
+  handleAppleSignIn: () => console.warn('Apple sign-in handler not provided'),
 };
 
 export default LoginFormEnhanced;

@@ -305,7 +305,7 @@ export const resetPassword = async (token, password, passwordConfirm) => {
     if (!password || !passwordConfirm) {
       throw new Error('Password and confirmation are required');
     }
-    
+
     if (password !== passwordConfirm) {
       throw new Error('Passwords do not match');
     }
@@ -336,5 +336,69 @@ export const resetPassword = async (token, password, passwordConfirm) => {
   } catch (error) {
     console.error('Password reset failed:', error.response?.data?.message || error.message);
     throw new Error(error.response?.data?.message || 'Password reset failed. Please try again.');
+  }
+};
+
+/**
+ * Sign in with Google
+ * @returns {Promise<Object>} - Promise resolving to user data
+ * @throws {Error} - Throws an error if Google sign-in fails
+ */
+export const signInWithGoogle = async () => {
+  try {
+    // Initiate the Google sign-in flow by getting the redirect URL from the backend
+    const response = await apiClient.get('/auth/google');
+    
+    // If we get a redirect URL, redirect the user to Google's auth page
+    if (response.data && response.data.redirectUrl) {
+      // Open the Google auth page in the same window
+      window.location.href = response.data.redirectUrl;
+      return { redirecting: true };
+    }
+    
+    throw new Error('Invalid response from server');
+  } catch (error) {
+    console.error('Google sign-in failed:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Google sign-in failed. Please try again.');
+  }
+};
+
+/**
+ * Sign in with Apple
+ * @returns {Promise<Object>} - Promise resolving to user data
+ * @throws {Error} - Throws an error if Apple sign-in fails
+ */
+export const signInWithApple = async () => {
+  try {
+    // Initiate the Apple sign-in flow
+    // The backend will handle the OAuth flow and return user data
+    // const response = await apiClient.get('/auth/apple');
+    
+    // Handle the response from the backend
+    // if (response.data && response.data.data && response.data.data.user) {
+    //   localStorage.setItem('user-personal-finance', JSON.stringify(response.data.data.user));
+      
+    //   // If token is provided directly in the response, store it
+    //   if (response.data.token) {
+    //     setToken(response.data.token);
+    //   }
+      
+    //   return response.data.data.user;
+    // }
+    
+    // If we get a redirect URL instead of user data, return it
+    // if (response.data && response.data.redirectUrl) {
+    //   window.location.href = response.data.redirectUrl;
+    //   return { redirecting: true };
+    // }
+
+    setTimeout (()=>{
+      console.log("Apple Sign in Not working")
+    }, 2000)
+    
+    throw new Error('Apple Sign In is currently not available.');
+  } catch (error) {
+    console.error('Apple sign-in failed:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data?.message || 'Apple Sign In is currently not available.');
   }
 };

@@ -50,6 +50,7 @@ export const FinancialProvider = ({ children }) => {
       const sourceData = {
         name: source.name,
         type: source.type,
+        institution: source.institution || '', 
         description: source.description || '',
         colorCode: source.colorCode || '#4CAF50',
         initialBalance: source.initialBalance || 0,

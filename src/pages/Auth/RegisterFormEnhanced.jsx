@@ -1,6 +1,3 @@
-// Enhanced register form component with premium styling
-// This will be integrated into the main Register.jsx file
-
 import React from "react";
 import {
   TbLock,
@@ -18,6 +15,7 @@ import {
   TbUserCircle,
   TbAlertTriangle,
 } from "react-icons/tb";
+import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { PiPasswordDuotone, PiUserDuotone } from "react-icons/pi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -36,6 +34,10 @@ const RegisterFormEnhanced = ({
   setShowConfirmPassword,
   handleSubmit,
   navigateToLogin,
+  handleGoogleSignIn,
+  handleAppleSignIn,
+  isGoogleLoading,
+  isAppleLoading,
 }) => {
   return (
     <div
@@ -71,14 +73,36 @@ const RegisterFormEnhanced = ({
 
         {/* Social login buttons */}
         <div className="flex space-x-4 mb-6 lg:mb-8">
-          <button className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20">
-            <FcGoogle className="h-5 w-5 mr-2 text-red-400" />
-            <span className="text-sm font-medium">Google</span>
-          </button>
-          <button className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20">
-            <TbBrandApple className="h-5 w-5 mr-2" />
-            <span className="text-sm font-medium">Apple</span>
-          </button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={handleGoogleSignIn}
+            disabled={isSubmitting}
+            className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20"
+          >
+            {isGoogleLoading ? (
+              <TbLoader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <FcGoogle className="h-5 w-5 mr-2 text-red-400" />
+                <span className="text-sm font-medium">Google</span>
+              </>
+            )}
+          </motion.button>
+          <motion.button
+          whileTap={{scale: 0.98}}
+            onClick={handleAppleSignIn}
+            disabled={isSubmitting}
+            className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20"
+          >
+            {isAppleLoading ? (
+              <TbLoader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <TbBrandApple className="h-5 w-5 mr-2" />
+                <span className="text-sm font-medium">Apple</span>
+              </>
+            )}
+          </motion.button>
         </div>
 
         {/* Divider */}
@@ -95,14 +119,14 @@ const RegisterFormEnhanced = ({
 
         <div className="space-y-4 md:space-y-5">
           {/* Auth error message */}
-                   {authError && (
-                     <div className="rounded-xl bg-red-500/20 backdrop-blur-sm p-4 border border-red-500/40">
-                       <p className="text-sm font-medium text-red-300 flex items-center">
-                         <TbAlertTriangle className="mr-2 h-5 w-5 text-red-400" />
-                         {authError}
-                       </p>
-                     </div>
-                   )}
+          {authError && (
+            <div className="rounded-xl bg-red-500/20 backdrop-blur-sm p-4 border border-red-500/40">
+              <p className="text-sm font-medium text-red-300 flex items-center">
+                <TbAlertTriangle className="mr-2 h-5 w-5 text-red-400" />
+                {authError}
+              </p>
+            </div>
+          )}
           {/* Name field */}
           <div className="space-y-2">
             <label
@@ -348,11 +372,10 @@ const RegisterFormEnhanced = ({
                   </>
                 ) : (
                   <>
-                    
                     <RiUserAddLine className="mr-2 h-5 w-5 " />
                     Create account
                     <TbArrowRight className="inline h-4 w-4 ml-1.5 group-hover:translate-x-1 transition-transform duration-300" />
-                    </>
+                  </>
                 )}
               </span>
             </button>
@@ -374,6 +397,14 @@ const RegisterFormEnhanced = ({
       </div>
     </div>
   );
+};
+
+// Set default props
+RegisterFormEnhanced.defaultProps = {
+  isGoogleLoading: false,
+  isAppleLoading: false,
+  handleGoogleSignIn: () => console.warn("Google sign-in handler not provided"),
+  handleAppleSignIn: () => console.warn("Apple sign-in handler not provided"),
 };
 
 export default RegisterFormEnhanced;

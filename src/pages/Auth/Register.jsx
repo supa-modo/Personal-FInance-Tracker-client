@@ -29,8 +29,10 @@ const Register = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   
-  const { register, isAuthenticated, error: authError } = useAuth();
+  const { register, signInWithGoogle, signInWithApple, isAuthenticated, error: authError } = useAuth();
   const navigate = useNavigate();
   
   // Redirect if already authenticated
@@ -108,6 +110,32 @@ const Register = () => {
 
   const navigateToLogin = () => {
     navigate('/login');
+  };
+  
+  // Handle Google Sign-in
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true);
+      await signInWithGoogle();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+  
+  // Handle Apple Sign-in
+  const handleAppleSignIn = async () => {
+    try {
+      setIsAppleLoading(true);
+      await signInWithApple();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Apple sign-in error:', error);
+    } finally {
+      setIsAppleLoading(false);
+    }
   };
 
   return (
@@ -201,13 +229,16 @@ const Register = () => {
           isSubmitting={isSubmitting}
           showPassword={showPassword}
           showConfirmPassword={showConfirmPassword}
-          isFormFocused={false}
-          authError={authError}
-          handleChange={handleChange}
           setShowPassword={setShowPassword}
           setShowConfirmPassword={setShowConfirmPassword}
+          handleChange={handleChange}
           handleSubmit={handleSubmit}
           navigateToLogin={navigateToLogin}
+          authError={authError}
+          handleGoogleSignIn={handleGoogleSignIn}
+          handleAppleSignIn={handleAppleSignIn}
+          isGoogleLoading={isGoogleLoading}
+          isAppleLoading={isAppleLoading}
         />
         
         {/* Mobile features - only visible on small screens */}

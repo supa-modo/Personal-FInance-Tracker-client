@@ -240,7 +240,7 @@ const AddFinancialSourceModalEnhanced = ({ isOpen, onClose, onAdd }) => {
                   className={`block w-full px-3 py-2.5 border ${
                     errors.institution ? "border-red-500" : "border-slate-600"
                   } bg-slate-800/50 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-slate-400`}
-                  placeholder="e.g., Savings Account"
+                  placeholder="e.g., ABC Bank"
                 />
                 {errors.institution && (
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

@@ -32,7 +32,7 @@ const FinancialSourcesList = () => {
     deleteFinancialSource,
     addFinancialSource,
     updateFinancialSource,
-    getHistoricalNetWorthData,
+    getHistoricalNetWorth,
   } = useFinancial();
   
   const [historicalData, setHistoricalData] = useState([]);
@@ -54,7 +54,7 @@ const FinancialSourcesList = () => {
       if (financialSources.length > 0) {
         setHistoricalDataLoading(true);
         try {
-          const data = await getHistoricalNetWorthData('year');
+          const data = await getHistoricalNetWorth('year');
           setHistoricalData(data);
         } catch (error) {
           console.error('Error fetching historical data:', error);
@@ -65,7 +65,7 @@ const FinancialSourcesList = () => {
     };
     
     fetchHistoricalData();
-  }, [financialSources, getHistoricalNetWorthData]);
+  }, [financialSources, getHistoricalNetWorth]);
 
   // Filter sources based on search term, type, and active status
   const filteredSources = financialSources.filter((source) => {
@@ -129,7 +129,9 @@ const FinancialSourcesList = () => {
 
   const handleEditSource = async (updatedSource) => {
     try {
-      await updateFinancialSource(updatedSource);
+      // Extract the ID and pass it separately from the updates
+      const sourceId = updatedSource.id;
+      await updateFinancialSource(sourceId, updatedSource);
       setIsEditModalOpen(false);
       setSourceToEdit(null);
     } catch (error) {

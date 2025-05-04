@@ -27,9 +27,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isFormFocused, setIsFormFocused] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   
   // Use the authentication hook
-  const { login, isAuthenticated, error: authError } = useAuth();
+  const { login, signInWithGoogle, signInWithApple, isAuthenticated, error: authError } = useAuth();
   const navigate = useNavigate();
   
   // Email validation function
@@ -104,6 +106,31 @@ const Login = () => {
 
   const navigateToForgotPassword = () => {
     navigate('/forgot-password');
+  };
+  
+  // Handle Google Sign-in
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true);
+      await signInWithGoogle();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+  
+  // Handle Apple Sign-in
+  const handleAppleSignIn = async () => {
+    try {
+      setIsAppleLoading(true);
+      await signInWithApple();
+    } catch (error) {
+      console.error('Apple sign-in error:', error);
+    } finally {
+      setIsAppleLoading(false);
+    }
   };
 
   return (
@@ -199,15 +226,18 @@ const Login = () => {
           isSubmitting={isSubmitting}
           showPassword={showPassword}
           rememberMe={rememberMe}
-          isFormFocused={isFormFocused}
-          authError={authError}
-          isAuthenticated={isAuthenticated}
-          handleChange={handleChange}
           setShowPassword={setShowPassword}
           setRememberMe={setRememberMe}
+          handleChange={handleChange}
           handleSubmit={handleSubmit}
           navigateToRegister={navigateToRegister}
           navigateToForgotPassword={navigateToForgotPassword}
+          authError={authError}
+          isAuthenticated={isAuthenticated}
+          handleGoogleSignIn={handleGoogleSignIn}
+          handleAppleSignIn={handleAppleSignIn}
+          isGoogleLoading={isGoogleLoading}
+          isAppleLoading={isAppleLoading}
         />
         
         {/* Mobile features - only visible on small screens */}
