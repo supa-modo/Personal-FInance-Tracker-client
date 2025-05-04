@@ -34,17 +34,24 @@ let inMemoryToken = null;
 const setToken = (token) => {
   inMemoryToken = token;
   
-  // For development, also store in localStorage as a backup
-  if (!isProduction() && token) {
-    localStorage.setItem('auth-token-dev', token);
+  // Store in localStorage for persistence across page refreshes
+  if (token) {
+    localStorage.setItem('jwt-personal-finance', token);
+    console.log('Token stored in localStorage and memory');
+  } else {
+    localStorage.removeItem('jwt-personal-finance');
+    console.log('Token removed from localStorage and memory');
   }
 };
 
 // Function to get the in-memory token
 const getToken = () => {
-  // For development, try to restore from localStorage if not in memory
-  if (!inMemoryToken && !isProduction()) {
-    inMemoryToken = localStorage.getItem('auth-token-dev');
+  // Try to restore from localStorage if not in memory
+  if (!inMemoryToken) {
+    inMemoryToken = localStorage.getItem('jwt-personal-finance');
+    if (inMemoryToken) {
+      console.log('Token restored from localStorage');
+    }
   }
   return inMemoryToken;
 };
@@ -55,11 +62,10 @@ apiClient.interceptors.request.use(
     // Always ensure withCredentials is set to true for all requests
     config.withCredentials = true;
     
-    // In production, add token to Authorization header as a backup mechanism
-    // This helps when cookies don't work properly across domains
+    // Add token to Authorization header for all requests
     const token = getToken();
-    if (token && isProduction()) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     
     return config;

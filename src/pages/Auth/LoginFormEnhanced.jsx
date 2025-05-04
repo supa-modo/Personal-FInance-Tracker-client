@@ -66,7 +66,8 @@ const LoginFormEnhanced = ({
 
         {/* Social login buttons */}
         <div className="flex space-x-4 mb-6 lg:mb-8">
-          <button 
+          <motion.button 
+          whileTap={{ scale: 0.98 }}
             onClick={handleGoogleSignIn}
             disabled={isSubmitting}
             className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20"
@@ -79,8 +80,9 @@ const LoginFormEnhanced = ({
                 <span className="text-sm font-medium">Google</span>
               </>
             )}
-          </button>
-          <button 
+          </motion.button>
+          <motion.button 
+          whileTap={{ scale: 0.98 }}
             onClick={handleAppleSignIn}
             disabled={isSubmitting}
             className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:shadow-lg hover:shadow-primary-800/20"
@@ -93,7 +95,7 @@ const LoginFormEnhanced = ({
                 <span className="text-sm font-medium">Apple</span>
               </>
             )}
-          </button>
+          </motion.button>
         </div>
 
         {/* Divider */}

@@ -19,8 +19,9 @@ export const AuthProvider = ({ children }) => {
       '/login', 
       '/register', 
       '/forgot-password',
-      '/reset-password'
-      
+      '/reset-password',
+      '/oauth-success',
+      '/oauth-failure'
     ];
 
     const currentPath = window.location.pathname;
